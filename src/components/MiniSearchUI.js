@@ -5,9 +5,11 @@ import PropTypes from 'prop-types';
 
 import NavbarSearch from '../components/NavbarSearch';
 import SearchResults from '../components/SearchResults';
+import SimpleSearchResult from '../components/SimpleSearchResult';
 import Scrollable from '../components/Scrollable';
 import SearchResultsCount from '../components/SearchResultsCount';
 import ObjectUtils from '../util/ObjectUtils';
+import SearchDocument from '../api/SearchDocument';
 
 type MiniSearchUIProps = {
   /**
@@ -76,7 +78,7 @@ export default class MiniSearchUI extends React.Component<MiniSearchUIDefaultPro
           }}
         >
           <SearchResults
-            format="simple"
+            format={SimpleSearchResult.forDocument}
             entityFields={ObjectUtils.toMap([])}
             style={{
               transform: `scale(${this.props.scale}, ${this.props.scale})`,

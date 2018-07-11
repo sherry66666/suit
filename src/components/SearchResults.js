@@ -3,43 +3,36 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import FieldNames from '../api/FieldNames';
-
-import SearchResult from './SearchResult';
 import SearchDocument from '../api/SearchDocument';
+
+import DebugSearchResult from './DebugSearchResult';
+import SimpleSearchResult from './SimpleSearchResult';
+
+type SearchResultRenderer = (doc: SearchDocument, position: number, key: string) => ?React$Element<any>;
 
 type SearchResultsProps = {
   /**
-   * Optional. The location of the node through which to interact with Attivio.
-   * Defaults to the value in the configuration.
-   */
-  baseUri: string;
-  /** The format to use for displaying the individual documents. */
-  format: 'list' | 'usercard' | 'doccard' | 'debug' | 'simple';
+   * The format to use for displaying the individual documents. Leave as the default
+   * (null) to use a simple search result. Otherwise, can be set to either a single function
+   * or an array of functions which will render the result for a given document given
+   * the document, its position in the list, and a unique key to use in the outermost component
+   * for React's sake. If this property is an array of functions, then they will be called, in
+   * turn, until one returns a non-null value or they have all been called. The first non-null
+   * value will be rendered.
+  */
+  format: null | SearchResultRenderer | Array<SearchResultRenderer>;
   /**
-   * Whether or not the documents’ relevancy scores should be displayed.
-   * Defaults to false.
-   */
-  showScores: boolean;
-  /**
-   * A map of the field names to the label to use for any entity fields.
-   * Defaults to show the people, locations, and companies entities.
-   */
-  entityFields: Map<string, string>;
-  /** Whether tags should be shown in the UI or not. Defaults to true. */
-  showTags: boolean;
-  /** Whether star ratings should be shown in the UI or not. Defaults to true. */
-  showRatings: boolean;
-  /** A style to apply to the results list */
+   * If this is set, then the debug view of the documents is shown instead of the specified format.
+   * The debug flag takes precedence.
+  */
+  debug: boolean;
+  /** An optional CSS style to apply to the results list as a whole */
   style: ?any;
 };
 
 type SearchResultsDefaultProps = {
-  baseUri: string;
-  format: 'list' | 'usercard' | 'doccard' | 'debug' | 'simple';
-  showScores: boolean;
-  entityFields: Map<string, string>;
-  showTags: boolean;
-  showRatings: boolean;
+  format: null | SearchResultRenderer | Array<SearchResultRenderer>;
+  debug: boolean;
 };
 
 /**
@@ -48,12 +41,8 @@ type SearchResultsDefaultProps = {
  */
 export default class SearchResults extends React.Component<SearchResultsDefaultProps, SearchResultsProps, void> {
   static defaultProps = {
-    baseUri: '',
-    format: 'list',
-    showScores: false,
-    entityFields: new Map([['people', 'People'], ['locations', 'Locations'], ['companies', 'Companies']]),
-    showTags: true,
-    showRatings: true,
+    format: null,
+    debug: false,
   };
 
   static contextTypes = {
@@ -61,6 +50,32 @@ export default class SearchResults extends React.Component<SearchResultsDefaultP
   };
 
   static displayName = 'SearchResults';
+
+  renderIndividualResult(document: SearchDocument, position: number) {
+    let result = null;
+    // Document IDs are unique, so we use them as the keys
+    const key = document.getFirstValue(FieldNames.ID);
+
+    // Debug trumps other stuff
+    if (this.props.debug) {
+      result = DebugSearchResult.forDocument(document, position, key);
+    } else if (typeof this.props.format === 'function') {
+      result = this.props.format(document, position, key);
+    } else if (Array.isArray(this.props.format)) {
+      this.props.format.forEach((renderFunction) => {
+        if (!result) {
+          result = renderFunction(document, position, key);
+        }
+      });
+    } else {
+      result = SimpleSearchResult.forDocument(document, position, key);
+    }
+    if (!result) {
+      console.log(`No result created for document with ID ${key}; it won't be shown.`);
+    }
+
+    return result;
+  }
 
   renderResults() {
     const searcher = this.context.searcher;
@@ -70,21 +85,11 @@ export default class SearchResults extends React.Component<SearchResultsDefaultP
       const documents = response.documents;
       const results = [];
       documents.forEach((document: SearchDocument, index: number) => {
-        const key = document.getFirstValue(FieldNames.ID);
         const position = offset + index + 1;
-        results.push(
-          <SearchResult
-            document={document}
-            format={this.props.format}
-            position={position}
-            key={key}
-            showScores={this.props.showScores}
-            entityFields={this.props.entityFields}
-            baseUri={this.props.baseUri}
-            showRatings={this.props.showRatings}
-            showTags={this.props.showTags}
-          />,
-        );
+        const result = this.renderIndividualResult(document, position);
+        if (result) {
+          results.push(result);
+        }
       });
       return results;
     }
