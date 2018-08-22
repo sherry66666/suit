@@ -4,17 +4,13 @@ import React from 'react';
 
 type ProfilePhotoProps = {
   /** The URL of the profile photo. If not set, a placeholder will be shown. */
-  url: string | null;
-};
-
-type ProfilePhotoDefaultProps = {
-  url: string | null;
+  url?: string;
 };
 
 /**
  * Shows a person's profile photo.
  */
-export default class ProfilePhoto extends React.Component<ProfilePhotoDefaultProps, ProfilePhotoProps, void> {
+export default class ProfilePhoto extends React.Component<ProfilePhotoProps, void> {
   static defaultProps = {
     url: null,
   };

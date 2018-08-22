@@ -5,7 +5,7 @@ import React from 'react';
 /**
  * Header for the Experts page.
  */
-export default class ExpertsHeader extends React.Component<void, {}, void> {
+export default class ExpertsHeader extends React.Component<{}, void> {
   static displayName = 'ExpertsHeader';
 
   render() {

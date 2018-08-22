@@ -4,14 +4,15 @@ import PropTypes from 'prop-types';
 
 import PlacementResult from './PlacementResult';
 import Placement from '../api/Placement';
+import Searcher from './Searcher';
 
 /**
  * A container for showing a list of business center promotional placements from the search results.
  * These come from the parent Searcher component.
  */
-export default class PlacementResults extends React.Component<void, {}, void> {
+export default class PlacementResults extends React.Component<{}, void> {
   static contextTypes = {
-    searcher: PropTypes.any,
+    searcher: PropTypes.instanceOf(Searcher),
   };
 
   static displayName = 'PlacementResults';
@@ -25,10 +26,10 @@ export default class PlacementResults extends React.Component<void, {}, void> {
       placements.forEach((placement: Placement) => {
         results.push(
           <PlacementResult
-            linkUrl={placement.linkUrl}
-            linkText={placement.linkText}
-            imageUrl={placement.imageUrl}
-            markup={placement.markup}
+            linkUrl={placement.linkUrl || undefined}
+            linkText={placement.linkText || undefined}
+            imageUrl={placement.imageUrl || undefined}
+            markup={placement.markup || undefined}
           />,
         );
       });

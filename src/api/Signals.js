@@ -16,7 +16,7 @@ export default class Signals {
    *                    (including the protocol, hostname or IP address, and port number,
    *                    with no trailing slash)
    */
-  constructor(baseUri: string) {
+  constructor(baseUri: string = '') {
     this.baseUri = baseUri;
   }
 

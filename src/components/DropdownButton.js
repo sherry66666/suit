@@ -1,6 +1,6 @@
 // @flow
 
-import React, { Children } from 'react';
+import * as React from 'react';
 
 import Dropdown from 'react-bootstrap/lib/Dropdown';
 import Toggle from './Toggle';
@@ -11,7 +11,7 @@ type DropdownButtonProps = {
   /** The title to display on the un-opened dropdown button */
   title: string;
   /** The menu items to display when the dropdown is opened */
-  children: Children;
+  children: React.Node;
   /** The callback to run when the dropdown is opened */
   onOpen: (e: Event) => void;
   /** The callback to run when a menu item is selected */
@@ -21,7 +21,7 @@ type DropdownButtonProps = {
 /**
  * A button that displays a menu below it when clicked.
  */
-export default class DropdownButton extends React.Component<void, DropdownButtonProps, void> {
+export default class DropdownButton extends React.Component<DropdownButtonProps, void> {
   static displayName = 'DropdownButton';
 
   render() {

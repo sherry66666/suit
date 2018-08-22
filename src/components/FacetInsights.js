@@ -6,45 +6,33 @@ import Facet from './Facet';
 
 import SearchFacet from '../api/SearchFacet';
 import ObjectUtils from '../util/ObjectUtils';
+import Searcher from './Searcher';
 
 type FacetInsightsProps = {
   /** The facet field names that should be displayed as pie charts */
-  pieChartFacets: Array<string> | string | null;
+  pieChartFacets?: Array<string> | string;
   /** The facet field names that should be displayed as bar charts */
-  barChartFacets: Array<string> | string | null;
+  barChartFacets?: Array<string> | string;
   /** The facet field names that should be displayed as column charts */
-  columnChartFacets: Array<string> | string | null;
+  columnChartFacets?: Array<string> | string;
   /** The facet field names that should be displayed as lists with bars */
-  barListFacets: Array<string> | string | null;
+  barListFacets?: Array<string> | string;
   /** The facet field names that should be displayed as tag clouds */
-  tagCloudFacets: Array<string> | string | null;
+  tagCloudFacets?: Array<string> | string;
   /** The facet field names that should be displayed as time series */
-  timeSeriesFacets: Array<string> | string | null;
+  timeSeriesFacets?: Array<string> | string;
   /** The facet field names that should be displayed with a sentiment bar */
-  sentimentFacets: Array<string> | string | null;
+  sentimentFacets?: Array<string> | string;
   /** The facet field names that should be displayed with a geographic map */
-  geoMapFacets: Array<string> | string | null;
+  geoMapFacets?: Array<string> | string;
   /**
    * The maximum number of items to show in a facet. If there
    * are more than this many buckets for the facet, only this many, with
    * the highest counts, will be shown. Defaults to 15.
    */
-  maxFacetBuckets: number;
+  maxFacetBuckets?: number;
   /** Controls the colors used to show various entity types (the value can be any valid CSS color) */
-  entityColors: Map<string, string>;
-};
-
-type FacetInsightsDefaultProps = {
-  pieChartFacets: Array<string> | string | null;
-  barChartFacets: Array<string> | string | null;
-  columnChartFacets: Array<string> | string | null;
-  barListFacets: Array<string> | string | null;
-  tagCloudFacets: Array<string> | string | null;
-  timeSeriesFacets: Array<string> | string | null;
-  sentimentFacets: Array<string> | string | null;
-  geoMapFacets: Array<string> | string | null;
-  maxFacetBuckets: number;
-  entityColors: Map<string, string>;
+  entityColors?: Map<string, string>;
 };
 
 /**
@@ -52,10 +40,10 @@ type FacetInsightsDefaultProps = {
  * It must be contained within a Searcher component and
  * will obtain the list of facets from there. Via properties,
  * you can specify how to display specific facets. Any facet
- * not coveed by one of these property's lists will be displayed
+ * not covered by one of these property's lists will be displayed
  * in a standard "More…" list.
  */
-export default class FacetInsights extends React.Component<FacetInsightsDefaultProps, FacetInsightsProps, void> {
+export default class FacetInsights extends React.Component<FacetInsightsProps, void> {
   static defaultProps = {
     pieChartFacets: null,
     barChartFacets: null,
@@ -66,16 +54,16 @@ export default class FacetInsights extends React.Component<FacetInsightsDefaultP
     sentimentFacets: null,
     geoMapFacets: null,
     maxFacetBuckets: 15,
-    entityColors: new Map(),
+    entityColors: (new Map() : Map<string, string>),
   };
 
   static contextTypes = {
-    searcher: PropTypes.any,
+    searcher: PropTypes.instanceOf(Searcher),
   };
 
   static displayName = 'FacetInsights';
 
-  static matchesFacetList(field: string, facetList: Array<string> | string | null): boolean {
+  static matchesFacetList(field: string, facetList?: Array<string> | string): boolean {
     if (facetList) {
       if (typeof facetList === 'string') {
         return (facetList: string) === field;

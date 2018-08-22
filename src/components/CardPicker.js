@@ -26,13 +26,13 @@ type CardPickerProps = {
    * The key of the first item to select, if any. Defaults to not having
    * an initial selection.
    */
-  initialSelection: string | null;
+  initialSelection?: string;
   /**
    * The icon to use if a particular card item doesn't have
    * one defined. If all of the items will have icons assigned,
    * you don't need to set this.
    */
-  defaultIconUri: string | null;
+  defaultIconUri?: string;
   /**
    * Callback is called when the selection changes.
    */
@@ -41,27 +41,21 @@ type CardPickerProps = {
    * The number of columns in the card picker. This determines
    * the width of each card. Defaults to 3 columns.
    */
-  columns: number;
-};
-
-type CardPickerDefaultProps = {
-  initialSelection: string | null;
-  defaultIconUri: string | null;
-  columns: number;
+  columns?: number;
 };
 
 type CardPickerState = {
-  selection: string | null;
+  selection?: string;
 };
 
-export default class CardPicker extends React.Component<CardPickerDefaultProps, CardPickerProps, CardPickerState> {
+export default class CardPicker extends React.Component<CardPickerProps, CardPickerState> {
   static defaultProps = {
     initialSelection: null,
-    defaultIconUri: null,
+    defaultIconUri: undefined,
     columns: 3,
   };
 
-  static CardPickerItem;
+  static CardPickerItem: typeof(CardPickerItem);
 
   constructor(props: CardPickerProps) {
     super(props);
@@ -87,7 +81,7 @@ export default class CardPicker extends React.Component<CardPickerDefaultProps, 
         <CardPickerCard
           key={`${cardItem.label}|${cardItem.iconUri ? cardItem.iconUri : 'noicon'}`}
           label={cardItem.label}
-          iconUri={cardItem.iconUri || this.props.defaultIconUri}
+          iconUri={cardItem.iconUri || this.props.defaultIconUri || ''}
           selected={cardItem.key === this.state.selection}
           onClick={() => { this.onClick(cardItem.key); }}
           columns={this.props.columns}
@@ -104,22 +98,3 @@ export default class CardPicker extends React.Component<CardPickerDefaultProps, 
 }
 
 CardPicker.CardPickerItem = CardPickerItem;
-
-/*
-      <Scrollable style={{ height: '100%' }}>
-        <div
-          style={{
-            width: '100%',
-            padding: 0,
-            display: 'flex',
-            flex: 1,
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-            justifyContent: 'flex-start',
-            alignItems: 'flex-start',
-          }}
-        >
-          {cardComponnents}
-        </div>
-      </Scrollable>
-*/

@@ -9,11 +9,11 @@ type StringListEditorProps = {
   /**
    * The tooltip to use for the add (plus) button. Defaults to 'Add.'
    */
-  addButtonTooltip: string;
+  addButtonTooltip?: string;
   /**
    * The placeholder text to show in the input control. Defaults to 'Enter a value…'
    */
-  placeholder: string;
+  placeholder?: string;
   /**
    * The list of strings being edited.
    */
@@ -25,16 +25,11 @@ type StringListEditorProps = {
   updateList: (items: Array<string>) => void;
 };
 
-type StringListEditorDefaultProps = {
-  addButtonTooltip: string;
-  placeholder: string;
-};
-
 type StringListEditorState = {
   value: string;
 }
 
-export default class StringListEditor extends React.Component<StringListEditorDefaultProps, StringListEditorProps, StringListEditorState> { // eslint-disable-line max-len
+export default class StringListEditor extends React.Component<StringListEditorProps, StringListEditorState> {
   static defaultProps = {
     addButtonTooltip: 'Add',
     placeholder: 'Enter a value\u2026',
@@ -59,7 +54,7 @@ export default class StringListEditor extends React.Component<StringListEditorDe
 
   state: StringListEditorState;
 
-  onChange(event: Event & { currentTarget: HTMLInputElement }) {
+  onChange(event: SyntheticEvent<HTMLInputElement>) {
     const newValue = event.currentTarget.value;
     this.setState({
       value: newValue,
@@ -83,9 +78,10 @@ export default class StringListEditor extends React.Component<StringListEditorDe
   }
 
   render() {
+    const addButtonTooltip = this.props.addButtonTooltip ? this.props.addButtonTooltip : '';
     return (
       <ListEditor
-        addButtonTooltip={this.props.addButtonTooltip}
+        addButtonTooltip={addButtonTooltip}
         items={this.props.items}
         itemAsString={StringListEditor.itemAsString}
         renderControl={this.renderControl}

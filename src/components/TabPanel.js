@@ -22,20 +22,15 @@ type TabPanelProps = {
   /** A callback for when the current tab is changed */
   tabChanged: (newTabId: string) => void;
   /** If set, this is a label that will appear before the first tab */
-  tabLabel: string | null;
+  tabLabel?: string;
   /**
    * If set, then this will get the attivio-nested-search-tabpanel CSS
    * class assigned, for use in nested search results.
    */
-  nested: boolean;
+  nested?: boolean;
 };
 
-type TabPanelDefaultProps = {
-  tabLabel: string | null;
-  nested: boolean;
-};
-
-export default class TabPanel extends React.Component<TabPanelDefaultProps, TabPanelProps, void> {
+export default class TabPanel extends React.Component<TabPanelProps, void> {
   static defaultProps = {
     tabLabel: null,
     nested: false,
@@ -43,7 +38,9 @@ export default class TabPanel extends React.Component<TabPanelDefaultProps, TabP
 
   static displayName = 'TabPanel';
 
-  static TabInfo;
+  static TabInfo: typeof(TabInfo);
+
+  tabElements: Array<?HTMLAnchorElement> = [];
 
   constructor(props: TabPanelProps) {
     super(props);
@@ -58,8 +55,6 @@ export default class TabPanel extends React.Component<TabPanelDefaultProps, TabP
       }
     });
   }
-
-  tabElements: Array<?HTMLAnchorElement> = [];
 
   render() {
     const tabTabs = this.props.tabInfos.map((tabInfo) => {

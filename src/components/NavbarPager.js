@@ -2,20 +2,16 @@
 import React from 'react';
 
 type NavbarPagerProps = {
-  /** The currenlty displayed page number (0-based). */
+  /** The currently displayed page number (0-based). */
   currentPage: number;
-  /** The total number of pages. */
-  maxPage: number;
+  /** The total number of pages. Defaults to the max integer value (essentially unbounded). */
+  maxPage?: number;
   /**
    * A callback that is called with a new page number when
-   * the user clicks the foreward or back button.
+   * the user clicks the forward or back button.
    */
   onChange: (newPage: number) => void;
 }
-
-type NavbarPagerDefaultProps = {
-  maxPage: number;
-};
 
 /**
  * Display a page control which lets the user go forward and
@@ -23,8 +19,8 @@ type NavbarPagerDefaultProps = {
  * page is also displayed. If at the beginning or end of the
  * pages, then the forward and back arrow buttons are disabled.
  */
-export default class NavbarPager extends React.Component<NavbarPagerDefaultProps, NavbarPagerProps, void> {
-  static defaultProps: NavbarPagerDefaultProps = {
+export default class NavbarPager extends React.Component<NavbarPagerProps, void> {
+  static defaultProps = {
     maxPage: Number.MAX_SAFE_INTEGER,
   };
 
@@ -43,21 +39,17 @@ export default class NavbarPager extends React.Component<NavbarPagerDefaultProps
   }
 
   navNext() {
-    if (this.props.currentPage < this.props.maxPage) {
+    if (this.props.maxPage && this.props.currentPage < this.props.maxPage) {
       this.props.onChange(this.props.currentPage + 1);
     }
   }
 
   render() {
     const canPageBack = this.props.currentPage > 0;
-    const canPageNext = this.props.currentPage < this.props.maxPage;
+    const canPageNext = this.props.maxPage && this.props.currentPage < this.props.maxPage;
     const baseButtonClass = 'attivio-globalmastnavbar-btn';
-    const previousButtonClass =
-      `${baseButtonClass} attivio-globalmastnavbar-pagination-previous attivio-icon-arrow-left-gray ${canPageBack ? '' :
-        'disabled'}`;
-    const nextButtonClass =
-      `${baseButtonClass} attivio-globalmastnavbar-pagination-next attivio-icon-arrow-right-gray ${canPageNext ? '' :
-        'disabled'}`;
+    const previousButtonClass = `${baseButtonClass} attivio-globalmastnavbar-pagination-previous attivio-icon-arrow-left-gray ${canPageBack ? '' : 'disabled'}`; // eslint-disable-line max-len
+    const nextButtonClass = `${baseButtonClass} attivio-globalmastnavbar-pagination-next attivio-icon-arrow-right-gray ${canPageNext ? '' : 'disabled'}`; // eslint-disable-line max-len
 
     return (
       <div className="attivio-globalmastnavbar-pagination">
@@ -65,7 +57,9 @@ export default class NavbarPager extends React.Component<NavbarPagerDefaultProps
           Previous
         </a>
         <div className="attivio-globalmastnavbar-pagination-page">
-          Page {this.props.currentPage + 1}
+          Page
+          {' '}
+          {this.props.currentPage + 1}
         </div>
         <a className={nextButtonClass}>
           Next

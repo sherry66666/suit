@@ -11,7 +11,7 @@ type NavbarFilterProps = {
 }
 
 /** Displays a currently applied facet filter. */
-export default class NavbarFilter extends React.Component<void, NavbarFilterProps, void> {
+export default class NavbarFilter extends React.Component<NavbarFilterProps, void> {
   static displayName = 'NavbarFilter';
 
   constructor(props: NavbarFilterProps) {
@@ -19,15 +19,16 @@ export default class NavbarFilter extends React.Component<void, NavbarFilterProp
     (this: any).remove = this.remove.bind(this);
   }
 
-  remove(event: Event & { target: HTMLAnchorElement }) {
+  remove(event: SyntheticEvent<HTMLAnchorElement>) {
     this.props.removeCallback();
-    event.target.blur();
+    event.currentTarget.blur();
   }
 
   render() {
     return (
       <div className="attivio-globalmastnavbar-filter">
-        {this.props.facetName}:
+        {this.props.facetName}
+        {':'}
         &nbsp;
         <a
           className="attivio-globalmastnavbar-filter-link attivio-icon-remove"

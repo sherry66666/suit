@@ -3,25 +3,20 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import Menu, { MenuItemDef } from './Menu';
+import Searcher from './Searcher';
 
 type NavbarSortProps = {
   /** If set, the menu will be pulled to the right side of its parent. */
-  right: boolean;
+  right?: boolean;
   /** The label to use for the menu. Defaults to "Sort:". */
-  label: string;
+  label?: string;
   /** The names of the fields to include in the menu. */
   fieldNames: Array<string>;
   /**
    * If set, a special Relevancy item will be added to the top of the
    * menu; it sorts on the ".score" field and only in descending order.
    */
-  includeRelevancy: boolean;
-};
-
-type NavbarSortDefaultProps = {
-  right: boolean;
-  label: string;
-  includeRelevancy: boolean;
+  includeRelevancy?: boolean;
 };
 
 /**
@@ -29,15 +24,15 @@ type NavbarSortDefaultProps = {
  * search results should be sorted by. It must be a child of
  * the Searcher component it is controlling.
  */
-export default class NavbarSort extends React.Component<NavbarSortDefaultProps, NavbarSortProps, void> {
-  static defaultProps: NavbarSortDefaultProps = {
+export default class NavbarSort extends React.Component<NavbarSortProps, void> {
+  static defaultProps = {
     right: false,
     label: 'Sort:',
     includeRelevancy: false,
   };
 
   static contextTypes = {
-    searcher: PropTypes.any,
+    searcher: PropTypes.instanceOf(Searcher),
   };
 
   static displayName = 'NavbarSort';
@@ -103,11 +98,12 @@ export default class NavbarSort extends React.Component<NavbarSortDefaultProps, 
     });
 
     const leftRight = this.props.right ? 'attivio-globalmastnavbar-right' : '';
+    const label = this.props.label ? this.props.label : 'Sort:';
 
     return (
       <div className={leftRight}>
         <Menu
-          label={this.props.label}
+          label={label}
           selection={currentSort}
           items={menuItems}
           onSelect={this.sortChanged}

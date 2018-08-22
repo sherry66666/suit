@@ -5,7 +5,7 @@ import validator from 'validator';
 
 export class LabeledDataPair {
   label: string;
-  value: string | Element;
+  value: any;
 
   constructor(label: string, value: string | Element) {
     this.label = label;
@@ -15,17 +15,12 @@ export class LabeledDataPair {
 
 type LabeledDataProps = {
   /** The names and values. Defaults to an empty array. */
-  data: Array<LabeledDataPair>;
+  data?: Array<LabeledDataPair>;
   /**
    * If true, then the labels appear on top of the values
    * instead of in a two-column format.
    */
-  stacked: boolean;
-};
-
-type LabeledDataDefaultProps = {
-  data: Array<LabeledDataPair>;
-  stacked: boolean;
+  stacked?: boolean;
 };
 
 /**
@@ -34,7 +29,7 @@ type LabeledDataDefaultProps = {
  * value is a string and appears to be a URL, it will be rendered
  * as a link that will navigate to that URL.
  */
-export default class LabeledData extends React.Component<LabeledDataDefaultProps, LabeledDataProps, void> {
+export default class LabeledData extends React.Component<LabeledDataProps, void> {
   static defaultProps = {
     data: [],
     stacked: false,
@@ -42,25 +37,31 @@ export default class LabeledData extends React.Component<LabeledDataDefaultProps
 
   static displayName = 'LabeledData';
 
-  static LabeledDataPair;
+  static LabeledDataPair: typeof(LabeledDataPair);
 
   render() {
     const className = this.props.stacked ? 'attivio-labeldata-stacked' : 'attivio-labeldata-2col';
     const rows = [];
-    this.props.data.forEach((item) => {
-      rows.push(<dt key={`${item.label}-label`}>{item.label}</dt>);
-      if (typeof item.value === 'string' && validator.isURL(item.value)) {
-        rows.push((
-          <dd className="attivio-labeldata-url" key={`${item.label}-value`}>
-            <a href={item.value} target="_blank" rel="noopener noreferrer">
+    if (this.props.data) {
+      this.props.data.forEach((item) => {
+        rows.push(<dt key={`${item.label}-label`}>{item.label}</dt>);
+        if (typeof item.value === 'string' && validator.isURL(item.value)) {
+          rows.push((
+            <dd className="attivio-labeldata-url" key={`${item.label}-value`}>
+              <a href={item.value} target="_blank" rel="noopener noreferrer">
+                {item.value}
+              </a>
+            </dd>
+          ));
+        } else {
+          rows.push((
+            <dd key={`${item.label}-value`}>
               {item.value}
-            </a>
-          </dd>
-        ));
-      } else {
-        rows.push(<dd key={`${item.label}-value`}>{item.value}</dd>);
-      }
-    });
+            </dd>
+          ));
+        }
+      });
+    }
 
     return (
       <dl className={className}>

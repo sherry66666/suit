@@ -9,6 +9,7 @@ import FieldNames from '../api/FieldNames';
 import AuthUtils from '../util/AuthUtils';
 import KnowledgeGraphUtils from '../util/KnowledgeGraphUtils';
 import NetworkDiagram, { Node, Edge } from './NetworkDiagram';
+import Searcher from './Searcher';
 
 import type { NetworkEventInfo } from './NetworkDiagram';
 
@@ -17,39 +18,28 @@ type KnowledgeGraphPanelProps = {
   doc: SearchDocument;
   /** The list of fields to use to do the join */
   linkingFields: Array<string>;
-  /** The maximum number of linked documents to display */
-  maxLinkedDocs: number;
-  /** The field in the document that has the table */
-  tableField: string;
-  /** A callback function used when the user double-clicks a document node */
-  navigateToDoc: (docId: string) => void;
-  /** A callback function used when the user double-clicks an entity node */
-  navigateToEntity: (entityType: string, entityValue: string) => void;
-  /** The name of the endity being searched on, or null if searching on a document */
-  entityName: string | null;
-  /** The value of the endity being searched on, or null if searching on a document */
-  entityValue: string | null;
+  /** The maximum number of linked documents to display. Defaults to 3. */
+  maxLinkedDocs?: number;
+  /** The field in the document that has the document's table. Defaults to the 'table' field. */
+  tableField?: string;
+  /** A optional callback function used when the user double-clicks a document node */
+  navigateToDoc?: (docId: string) => void;
+  /** An optional callback function used when the user double-clicks an entity node */
+  navigateToEntity?: (entityType: string, entityValue: string) => void;
+  /** The name of the entity being searched on, if searching by entity */
+  entityName?: string;
+  /** The value of the entity being searched on, if searching by entity */
+  entityValue?: string;
   /**
    * If set, even entities that don't link two doucments and aren't connected to
    * the primary document will be shown (these are hidden by default).
    */
-  showEdges: boolean;
+  showEdges?: boolean;
   /**
    * If true, then the 360° page will show links to documents from any table. Set this to false to
    * only show links to documnents that come from tables other than the one the main document is in.
    */
-  includeAllTables: boolean;
-};
-
-type KnowledgeGraphPanelDefaultProps = {
-  maxLinkedDocs: number;
-  tableField: string;
-  navigateToDoc: (docId: string) => void;
-  navigateToEntity: (entityType: string, entityValue: string) => void;
-  entityName: string | null;
-  entityValue: string | null;
-  showEdges: boolean;
-  includeAllTables: boolean;
+  includeAllTables?: boolean;
 };
 
 type KnowledgeGraphPanelState = {
@@ -58,7 +48,7 @@ type KnowledgeGraphPanelState = {
   error: string | null;
 };
 
-export default class KnowledgeGraphPanel extends React.Component<KnowledgeGraphPanelDefaultProps, KnowledgeGraphPanelProps, KnowledgeGraphPanelState> { // eslint-disable-line max-len
+export default class KnowledgeGraphPanel extends React.Component<KnowledgeGraphPanelProps, KnowledgeGraphPanelState> {
   static defaultProps = {
     maxLinkedDocs: 3,
     tableField: FieldNames.TABLE,
@@ -71,7 +61,7 @@ export default class KnowledgeGraphPanel extends React.Component<KnowledgeGraphP
   };
 
   static contextTypes = {
-    searcher: PropTypes.any,
+    searcher: PropTypes.instanceOf(Searcher),
   };
 
   static displayName = 'KnowledgeGraphPanel';
@@ -114,8 +104,8 @@ export default class KnowledgeGraphPanel extends React.Component<KnowledgeGraphP
   }
 
   componentWillReceiveProps(nextProps: KnowledgeGraphPanelProps) {
-    if (this.props.doc !== nextProps.doc || this.props.entityName !== nextProps.entityName ||
-        this.props.entityValue !== nextProps.entityValue) {
+    if (this.props.doc !== nextProps.doc || this.props.entityName !== nextProps.entityName
+      || this.props.entityValue !== nextProps.entityValue) {
       this.loadGraphForDocument(nextProps.doc, nextProps.entityName, nextProps.entityValue);
     }
   }
@@ -130,19 +120,24 @@ export default class KnowledgeGraphPanel extends React.Component<KnowledgeGraphP
             return n.id === nodeId;
           });
           if (node && node.docId) {
-            this.props.navigateToDoc(node.docId);
+            if (this.props.navigateToDoc) {
+              this.props.navigateToDoc(node.docId);
+            }
           } else if (node) {
-            this.props.navigateToEntity(node.group, node.label);
+            if (this.props.navigateToEntity) {
+              this.props.navigateToEntity(node.group, node.label);
+            }
           }
         }
       }
     }
   }
 
-  loadGraphForDocument(doc: SearchDocument, entityName: string | null, entityValue: string | null) {
+  loadGraphForDocument(doc: SearchDocument, entityName?: string, entityValue?: string) {
     if (this.context.searcher) {
       const docId = doc.getFirstValue(FieldNames.ID);
-      const table = this.props.includeAllTables ? null : doc.getFirstValue(this.props.tableField);
+      const table = this.props.includeAllTables ? null
+        : doc.getFirstValue(this.props.tableField ? this.props.tableField : FieldNames.TABLE);
 
       const query = KnowledgeGraphUtils.buildQuery(docId, table, this.props.tableField,
         this.props.linkingFields, this.props.maxLinkedDocs, entityName, entityValue);

@@ -10,11 +10,7 @@ type SearchResultTitleProps = {
    * Optional. The location of the node through which to interact with Attivio.
    * Defaults to the value in the configuration.
    */
-  baseUri: string;
-};
-
-type SearchResultTitleDefaultProps = {
-  baseUri: string;
+  baseUri?: string;
 };
 
 /**
@@ -22,7 +18,7 @@ type SearchResultTitleDefaultProps = {
  * the title is preserved so that highlighting, entities, and sentiment can
  * be displayed. It can optionally be made clickable, by passing a callback.
  */
-export default class SearchResultTitle extends React.Component<SearchResultTitleDefaultProps, SearchResultTitleProps, void> {
+export default class SearchResultTitle extends React.Component<SearchResultTitleProps, void> {
   static defaultProps = {
     baseUri: '',
   };

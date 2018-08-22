@@ -22,25 +22,21 @@ type TagCloudProps = {
    * are more than this many items, only this many, with the highest
    * value fields, will be shown. Defaults to 15.
    */
-  maxValues: number;
+  maxValues?: number;
   /**
    * A function that will get called with the selected TagCloudValue
    * object if one is clicked.
    */
   callback: (tcv: TagCloudValue) => void;
 
-  noLink: boolean;
-};
-
-type TagCloudDefaultProps = {
-  maxValues: number;
+  noLink?: boolean;
 };
 
 /**
  * Display a linear tag "cloud" where the items are proportionally sized
  * based on an associated value.
  */
-export default class TagCloud extends React.Component<TagCloudDefaultProps, TagCloudProps, void> {
+export default class TagCloud extends React.Component<TagCloudProps, void> {
   static defaultProps = {
     maxValues: 15,
     noLink: false,
@@ -48,7 +44,7 @@ export default class TagCloud extends React.Component<TagCloudDefaultProps, TagC
 
   static displayName = 'TagCloud';
 
-  static TagCloudValue;
+  static TagCloudValue: typeof(TagCloudValue);
 
   static getAdjustedValue(value: number, max: number): number {
     const ratio = value / max;
@@ -60,11 +56,10 @@ export default class TagCloud extends React.Component<TagCloudDefaultProps, TagC
   render() {
     const maxValue = this.props.tags.reduce((max, tcv) => {
       return Math.max(tcv.value, max);
-    }, 0,
-    );
+    }, 0);
 
     let tagCloudValues = this.props.tags;
-    if (tagCloudValues.length > this.props.maxValues) {
+    if (this.props.maxValues && tagCloudValues.length > this.props.maxValues) {
       // Sort numerically by value
       tagCloudValues.sort((tcv1: TagCloudValue, tcv2: TagCloudValue) => {
         if (tcv1.value === tcv2.value) {
@@ -86,20 +81,24 @@ export default class TagCloud extends React.Component<TagCloudDefaultProps, TagC
 
     const cloudItems = tagCloudValues.map((tcv) => {
       const size = TagCloud.getAdjustedValue(tcv.value, maxValue);
-      const callback = (event: Event & { target: HTMLAnchorElement }) => {
+      const callback = (event: SyntheticEvent<HTMLAnchorElement>) => {
         this.props.callback(tcv);
-        event.target.blur();
+        event.currentTarget.blur();
       };
       return (
-        this.props.noLink ? (<li key={tcv.label}>
-          <span className={`attivio-cloud-level-${size}`}>
-            {tcv.label}
-          </span>
-        </li>) : (<li key={tcv.label}>
-          <a className={`attivio-cloud-level-${size}`} onClick={callback} role="button" tabIndex={0}>
-            {tcv.label}
-          </a>
-        </li>)
+        this.props.noLink ? (
+          <li key={tcv.label}>
+            <span className={`attivio-cloud-level-${size}`}>
+              {tcv.label}
+            </span>
+          </li>
+        ) : (
+          <li key={tcv.label}>
+            <a className={`attivio-cloud-level-${size}`} onClick={callback} role="button" tabIndex={0}>
+              {tcv.label}
+            </a>
+          </li>
+        )
       );
     });
 

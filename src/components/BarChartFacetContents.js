@@ -13,20 +13,15 @@ type BarChartFacetContentsProps = {
   /** Callback to add a filter for this facet. */
   addFacetFilter: (bucket: SearchFacetBucket) => void;
   /** If set, the chart will contain columns (vertical bars) rather than horizontal bars */
-  columns: boolean;
+  columns?: boolean;
   /** If set, then the bars will be this color as opposed to the default blue */
-  color: string;
-};
-
-type BarChartFacetContentsDefaultProps = {
-  columns: boolean;
-  color: string;
+  color?: string;
 };
 
 /**
  * Component to display the buckets of a facet using a Bar chart.
  */
-export default class BarChartFacetContents extends React.Component<BarChartFacetContentsDefaultProps, BarChartFacetContentsProps, void> { // eslint-disable-line max-len
+export default class BarChartFacetContents extends React.Component<BarChartFacetContentsProps, void> {
   static defaultProps = {
     columns: false,
     color: '#55B3E3',

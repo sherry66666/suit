@@ -2,13 +2,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import Searcher from './Searcher';
+
 /**
  * The count of search results or an indication
  * that a search hasn't yet happened.
  */
-export default class SearchResultsCount extends React.Component<void, {}, void> {
+export default class SearchResultsCount extends React.Component<{}, void> {
   static contextTypes = {
-    searcher: PropTypes.any,
+    searcher: PropTypes.instanceOf(Searcher),
   };
 
   static displayName = 'SearchResultsCount';
@@ -34,7 +36,12 @@ export default class SearchResultsCount extends React.Component<void, {}, void> 
             {countMessage}
             <span style={{ fontWeight: 'normal' }}>
               {' '}
-              (in {response.totalTime}ms)
+              {'('}
+              in
+              {' '}
+              {response.totalTime}
+              ms
+              {')'}
             </span>
           </span>
         );

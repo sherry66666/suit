@@ -24,30 +24,21 @@ type SearchResultProps = {
    * Optional. The location of the node through which to interact with Attivio.
    * Defaults to the value in the configuration.
    */
-  baseUri: string;
+  baseUri?: string;
   /** The document to be displayed. */
   document: SearchDocument;
   /** The document’s position in the search results. */
   position: number,
   /** The format to use when displaying the document’s contents. */
-  format: 'list' | 'usercard' | 'doccard' | 'debug' | 'simple';
+  format?: 'list' | 'usercard' | 'doccard' | 'debug' | 'simple';
   /** Whether or not the documents’ relevancy scores should be displayed. Defaults to false. */
-  showScores: boolean;
+  showScores?: boolean;
   /** A map of the field names to the label to use for any entity fields */
-  entityFields: Map<string, string>;
+  entityFields?: Map<string, string>;
   /** Whether tags should be shown in the UI or not. Defaults to true. */
-  showTags: boolean;
+  showTags?: boolean;
   /** Whether star ratings should be shown in the UI or not. Defaults to true. */
-  showRatings: boolean;
-}
-
-type SearchResultDefaultProps = {
-  baseUri: string;
-  format: 'list' | 'usercard' | 'doccard' | 'debug' | 'simple';
-  showScores: boolean;
-  entityFields: Map<string, string>;
-  showTags: boolean;
-  showRatings: boolean;
+  showRatings?: boolean;
 }
 
 type SearchResultState = {
@@ -74,12 +65,12 @@ type SearchResultState = {
  *
  * For debug, any and all fields in the document are shown.
  */
-export default class SearchResult extends React.Component<SearchResultDefaultProps, SearchResultProps, SearchResultState> {
+export default class SearchResult extends React.Component<SearchResultProps, SearchResultState> {
   static defaultProps = {
     baseUri: '',
     format: 'list',
     showScores: false,
-    entityFields: new Map(),
+    entityFields: (new Map(): Map<string, string>),
     showTags: true,
     showRatings: true,
   };
@@ -207,7 +198,11 @@ export default class SearchResult extends React.Component<SearchResultDefaultPro
               </div>
             ) : null}
             {this.props.showScores ? <dt>Relevancy Score</dt> : ''}
-            {this.props.showScores ? <dd><RelevancyScore score={score} explanation={scoreDescription} id={docId} /></dd> : ''}
+            {this.props.showScores ? (
+              <dd>
+                <RelevancyScore score={score} explanation={scoreDescription} id={docId} />
+              </dd>
+            ) : ''}
           </dl>
         </div>
         <div className="attivio-search-result-content">
@@ -237,7 +232,7 @@ export default class SearchResult extends React.Component<SearchResultDefaultPro
 
     return (
       <Card key={docId} style={{ marginBottom: '5px' }}>
-        <div className="row" style={{ width: '100%', margin: 0 }} >
+        <div className="row" style={{ width: '100%', margin: 0 }}>
           <div className="col-sm-3 col-xs-4 col-md-3 col-lg-3" style={{ padding: 0 }}>
             <DocumentType docType={table} position={this.props.position} />
           </div>
@@ -245,7 +240,7 @@ export default class SearchResult extends React.Component<SearchResultDefaultPro
             <SearchResultTitle doc={doc} baseUri={this.props.baseUri} />
           </div>
         </div>
-        <div className="row" style={{ width: '100%', margin: 0 }} >
+        <div className="row" style={{ width: '100%', margin: 0 }}>
           <div
             className="col-sm-12 col-xs-12 col-md-12 col-lg-12"
             style={{
@@ -314,7 +309,9 @@ export default class SearchResult extends React.Component<SearchResultDefaultPro
               </div>
             ) : null}
             <dt>Relevancy Score</dt>
-            <dd><RelevancyScore score={score} description={scoreDescription} id={docId} /></dd>
+            <dd>
+              <RelevancyScore score={score} description={scoreDescription} id={docId} />
+            </dd>
           </dl>
         </div>
         <div className="col-xs-8 col-sm-8">

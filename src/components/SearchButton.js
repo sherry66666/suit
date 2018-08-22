@@ -2,13 +2,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import Searcher from './Searcher';
+
 type SearchButtonProps = {
   /** The button’s label. Defaults to "Go". */
-  label: string,
-};
-
-type SearchButtonDefaultProps = {
-  label: string,
+  label?: string,
 };
 
 /**
@@ -17,13 +15,13 @@ type SearchButtonDefaultProps = {
  * designed to be used in the Masthead component, already has its
  * own search button.
  */
-export default class SearchButton extends React.Component<SearchButtonDefaultProps, SearchButtonProps, void> {
+export default class SearchButton extends React.Component<SearchButtonProps, void> {
   static defaultProps = {
     label: 'Go',
   };
 
   static contextTypes = {
-    searcher: PropTypes.any,
+    searcher: PropTypes.instanceOf(Searcher),
   };
 
   static displayName = 'SearchButton';

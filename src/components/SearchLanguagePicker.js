@@ -3,31 +3,24 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import Menu, { MenuItemDef } from './Menu';
+import Searcher from './Searcher';
 
 type SearchLanguagePickerProps = {
   /** The label to show for the menu. Defaults to "Query Language". */
-  label: string,
+  label?: string,
   /** The label to show for the Simple Query Language option. Defaults to "Simple". */
-  simpleLabel: string,
+  simpleLabel?: string,
   /** The label to show for the Advanced Query Language option. Defaults to "Advanced". */
-  advancedLabel: string,
+  advancedLabel?: string,
   /** If set, then the menu will be shown at the right end of the navbar. */
-  right: boolean;
-}
-
-type SearchLanguagePickerDefaultProps = {
-  label: string,
-  simpleLabel: string,
-  advancedLabel: string,
-  right: boolean;
+  right?: boolean;
 }
 
 /**
  * A pop-up for choosing between the simple and advanced query language.
  */
-export default class SearchLanguagePicker extends React.Component<SearchLanguagePickerDefaultProps, SearchLanguagePickerProps, void> { // eslint-disable-line max-len
+export default class SearchLanguagePicker extends React.Component<SearchLanguagePickerProps, void> { // eslint-disable-line max-len
   static defaultProps = {
-    initialValue: 'simple',
     label: 'Query Language:',
     simpleLabel: 'Simple',
     advancedLabel: 'Advanced',
@@ -35,7 +28,7 @@ export default class SearchLanguagePicker extends React.Component<SearchLanguage
   };
 
   static contextTypes = {
-    searcher: PropTypes.any,
+    searcher: PropTypes.instanceOf(Searcher),
   };
 
   static displayName = 'SearchLanguagePicker';
@@ -60,8 +53,8 @@ export default class SearchLanguagePicker extends React.Component<SearchLanguage
     }
 
     const items = [
-      new MenuItemDef(this.props.simpleLabel, 'simple'),
-      new MenuItemDef(this.props.advancedLabel, 'advanced'),
+      new MenuItemDef(this.props.simpleLabel || '', 'simple'),
+      new MenuItemDef(this.props.advancedLabel || '', 'advanced'),
     ];
 
     const leftRight = this.props.right ? 'attivio-globalmastnavbar-right' : '';
@@ -69,7 +62,7 @@ export default class SearchLanguagePicker extends React.Component<SearchLanguage
     return (
       <div className={leftRight}>
         <Menu
-          label={this.props.label}
+          label={this.props.label || ''}
           items={items}
           selection={value}
           onSelect={this.onSelect}

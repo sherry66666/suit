@@ -19,38 +19,30 @@ type ExpertCardProps = {
   /** The full name of the expert. */
   expertName: string;
   /** The URI of the expert's photo. If not set, then a placeholder image is used. */
-  expertImage: string;
+  expertImage?: string;
   /** The title of the expert. */
   expertTitle: string;
   /** The department the expert belongs to. */
   expertDepartment: string;
   /** The employee ID for the expert. If missing, no ID will be displayed. */
-  expertId: string | null;
-  /** The expert's date of birth. If missing, no birthdate will be displayed. */
-  expertBirthdate: Date | null;
+  expertId?: string;
+  /** The expert's date of birth. If missing, no birth date will be displayed. */
+  expertBirthdate?: Date;
   /** A list of areas of expertise for this expert. */
   expertiseList: Array<ExpertiseItem>;
   /** The number of documents the expert has authored */
-  authorCount: number;
+  authorCount?: number;
   /**
    * A message (to be formatted) saying how many documents the author has formatted.
-   * Should contian a placeholder for the count.
+   * Should contain a placeholder for the count.
    */
-  authoredMessage: string;
-};
-
-type ExpertCardDefaultProps = {
-  expertImage: string;
-  expertId: string | null;
-  expertBirthdate: Date | null;
-  authorCount: number;
-  authoredMessage: string;
+  authoredMessage?: string;
 };
 
 /**
  * Displays a card with details about an "expert" within the company.
  */
-export default class ExpertCard extends React.Component<ExpertCardDefaultProps, ExpertCardProps, void> {
+export default class ExpertCard extends React.Component<ExpertCardProps, void> {
   static defaultProps = {
     expertImage: 'img/placeholder-person.svg',
     expertId: null,
@@ -61,7 +53,7 @@ export default class ExpertCard extends React.Component<ExpertCardDefaultProps, 
 
   static displayName = 'ExpertCard';
 
-  static ExpertiseItem;
+  static ExpertiseItem: typeof(ExpertiseItem);
 
   render() {
     const imageAlt = this.props.expertImage ? this.props.expertName : 'Expert placeholder';
@@ -75,16 +67,22 @@ export default class ExpertCard extends React.Component<ExpertCardDefaultProps, 
     });
 
     // Only show these if they're set on the component
-    const expertId = this.props.expertId ? [<dt key="expertId-label">Employee</dt>, <dd key="expertId-value">{this.props.expertId}</dd>] : ''; // eslint-disable-line max-len
-    const expertBirthdate = this.props.expertBirthdate ?
-      [<dt key="expertDOB-label">Birthdate</dt>, <dd key="expertDOB-value"><FormattedDate date={this.props.expertBirthdate} format={DateFormat.MEDIUM_DATE} /></dd>] : ''; // eslint-disable-line max-len
+    const expertId = this.props.expertId
+      ? [<dt key="expertId-label">Employee</dt>, <dd key="expertId-value">{this.props.expertId}</dd>] : '';
+    const expertBirthdate = this.props.expertBirthdate
+      ? [
+        <dt key="expertDOB-label">Birthdate</dt>,
+        <dd key="expertDOB-value"><FormattedDate date={this.props.expertBirthdate} format={DateFormat.MEDIUM_DATE} /></dd>,
+      ] : '';
 
     let authorOf = '';
-    if (this.props.authorCount > 0) {
+    if (this.props.authorCount && this.props.authorCount > 0 && this.props.authoredMessage) {
       const formattedAuthorMessage = StringUtils.fmt(this.props.authoredMessage, this.props.authorCount);
       authorOf = (
         <p className="attivio-expert-detail">
-          Authored <a className="attivio-expert-detail-link">{formattedAuthorMessage}</a>
+          Authored
+          {' '}
+          <a className="attivio-expert-detail-link">{formattedAuthorMessage}</a>
         </p>
       );
     }

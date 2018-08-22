@@ -11,21 +11,17 @@ type RelevancyScoreProps = {
   id: string;
   /** The relevancy score to display. */
   score: number;
-  /** The explanation of the score, if known. If not set, no explaination is displayed. */
-  explanation: string | null;
-};
-
-type RelevancyScoreDefaultProps = {
-  explanation: string | null;
+  /** The explanation of the score, if known. If not set, no explanation is displayed. */
+  explanation?: string;
 };
 
 /**
  * Display the relevancy score for a document, including providing
  * a popover with the explanation of the score.
  */
-export default class RelevancyScore extends React.Component<RelevancyScoreDefaultProps, RelevancyScoreProps, void> {
+export default class RelevancyScore extends React.Component<RelevancyScoreProps, void> {
   static defaultProps = {
-    explanation: null,
+    explanation: undefined,
   };
 
   static displayName = 'RelevancyScore';

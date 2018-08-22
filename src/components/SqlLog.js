@@ -9,18 +9,14 @@ type SqlLogProps = {
    * A label to display at the top of the log list. Defaults to "Search Query"
    * which is what the query analytics functionality uses.
    */
-  label: string;
-};
-
-type SqlLogDefaultProps = {
-  label: string;
+  label?: string;
 };
 
 /**
  * Shows a list of log entries, with alternating backgrounds like old-fashioned
  * green-bar printer paper.
  */
-export default class SqlLog extends React.Component<SqlLogDefaultProps, SqlLogProps, void> {
+export default class SqlLog extends React.Component<SqlLogProps, void> {
   static defaultProps = {
     label: 'Search Query',
   };

@@ -1,15 +1,15 @@
 // @flow
-import React, { Children } from 'react';
+import * as React from 'react';
 
 type SecondaryNavBarProps = {
   /** The items to display in the nav bar. */
-  children: Children;
+  children: React.Node;
 }
 
 /**
  * A row of subordinate navigation and/or controls under the masthead.
  */
-export default class SecondaryNavBar extends React.Component<void, SecondaryNavBarProps, void> {
+export default class SecondaryNavBar extends React.Component<SecondaryNavBarProps, void> {
   static displayName = 'SecondaryNavBar';
 
   render() {

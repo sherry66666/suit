@@ -29,19 +29,15 @@ type AccordionProps = {
    * The ID of the panel that should be the default open one. If not
    * set, the first panel's ID will be used.
    */
-  defaultPanelKey: string | null;
-};
-
-type AccordionDefaultProps = {
-  defaultPanelKey: string | null;
+  defaultPanelKey?: string | null;
 };
 
 /**
  * This component presents a series of titled, collapsible panels, only one of which can be open at
  * any given time.
  */
-export default class Accordion extends React.Component<AccordionDefaultProps, AccordionProps, void> {
-  static AccordionPanel;
+export default class Accordion extends React.Component<AccordionProps, void> {
+  static AccordionPanel: typeof(AccordionPanel);
 
   static defaultProps = {
     defaultPanelKey: null,

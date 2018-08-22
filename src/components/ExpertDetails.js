@@ -8,10 +8,10 @@ type ExpertDetailsProps = {
   expert: ExpertInfo;
 };
 
-export default class ExpertDetails extends React.Component<void, ExpertDetailsProps, void> {
+export default class ExpertDetails extends React.Component<ExpertDetailsProps, void> {
   static displayName = 'ExpertDetails';
 
-  static ExpertInfo;
+  static ExpertInfo: typeof(ExpertInfo);
 
   render() {
     return (

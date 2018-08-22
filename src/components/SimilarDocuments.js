@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 
 import FieldNames from '../api/FieldNames';
 
+import Searcher from './Searcher';
 import SearchResult from './SearchResult';
 import SearchDocument from '../api/SearchDocument';
 import SimpleQueryRequest from '../api/SimpleQueryRequest';
@@ -14,15 +15,11 @@ type SimilarDocumentsProps = {
    * Optional. The location of the node through which to interact with Attivio.
    * Defaults to the value in the configuration.
    */
-  baseUri: string;
+  baseUri?: string;
   /**
    * The documents to which you'd like to see similar documents.
    */
   baseDoc: SearchDocument | null;
-};
-
-type SimilarDocumentsDefaultProps = {
-  baseUri: string;
 };
 
 type SimilarDocumentsState = {
@@ -38,13 +35,13 @@ type SimilarDocumentsState = {
  * A container for showing a list of documents from the search results.
  * This comes from the parent Searcher component.
  */
-export default class SimilarDocuments extends React.Component<SimilarDocumentsDefaultProps, SimilarDocumentsProps, SimilarDocumentsState> { // eslint-disable-line max-len
+export default class SimilarDocuments extends React.Component<SimilarDocumentsProps, SimilarDocumentsState> { // eslint-disable-line max-len
   static defaultProps = {
     baseUri: '',
   }
 
   static contextTypes = {
-    searcher: PropTypes.any,
+    searcher: PropTypes.instanceOf(Searcher),
   };
 
   static displayName = 'SimilarDocuments';

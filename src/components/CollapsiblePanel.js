@@ -1,22 +1,17 @@
 // @flow
-import React, { Children } from 'react';
+import * as React from 'react';
 
 type CollapsiblePanelProps = {
   /** The contents of the panel can be whatever you like. */
-  children: Children;
+  children: React.Node;
   /** The title displayed in the header of the panel. */
   title: string;
   /** An ID used to coordinate between the various pieces. */
   id: string;
   /** If set, the panel will be drawn with a border, like a Card. */
-  bordered: boolean;
+  bordered?: boolean;
   /** If set, then the panel's initial state will be collapsed. */
-  collapsed: boolean;
-}
-
-type CollapsiblePanelDefaultProps = {
-  bordered: boolean;
-  collapsed: boolean;
+  collapsed?: boolean;
 }
 
 type CollapsiblePanelState = {
@@ -28,7 +23,7 @@ type CollapsiblePanelState = {
  * its header. It's used, for example, for displaying facets in
  * search results but can be used with whatever contents you like.
  */
-export default class CollapsiblePanel extends React.Component<CollapsiblePanelDefaultProps, CollapsiblePanelProps, CollapsiblePanelState> { // eslint-disable-line max-len
+export default class CollapsiblePanel extends React.Component<CollapsiblePanelProps, CollapsiblePanelState> { // eslint-disable-line max-len
   static defaultProps = {
     bordered: false,
     collapsed: false,
@@ -50,7 +45,8 @@ export default class CollapsiblePanel extends React.Component<CollapsiblePanelDe
   link: ?HTMLAnchorElement;
 
   toggleState() {
-    this.setState({ open: !this.state.open });
+    const open = !this.state.open;
+    this.setState({ open });
     if (this.link) {
       this.link.blur();
     }
@@ -75,7 +71,9 @@ export default class CollapsiblePanel extends React.Component<CollapsiblePanelDe
               this.link = c;
             }}
           >
-            {this.props.title} <i className="attivio-icon-arrow-down" />
+            {this.props.title}
+            {' '}
+            <i className="attivio-icon-arrow-down" />
           </a>
         </h3>
         <div

@@ -3,14 +3,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import SearchButton from './SearchButton';
+import Searcher from './Searcher';
 
 type SearchInputFieldProps = {
   /** The placeholder to display if the field is empty. Defaults to "Search…". */
-  placeholder: string;
-};
-
-type SearchInputFieldDefaultProps = {
-  placeholder: string;
+  placeholder?: string;
 };
 
 /**
@@ -20,13 +17,13 @@ type SearchInputFieldDefaultProps = {
  * other children of the Searcher. It is designed to be used outside of
  * the masthead, unlike the <code>SearchBar</code> component.
  */
-export default class SearchInputField extends React.Component<SearchInputFieldDefaultProps, SearchInputFieldProps, void> {
+export default class SearchInputField extends React.Component<SearchInputFieldProps, void> {
   static defaultProps = {
     placeholder: 'Search\u2026',
   };
 
   static contextTypes = {
-    searcher: PropTypes.any,
+    searcher: PropTypes.instanceOf(Searcher),
   };
 
   static displayName = 'SearchInputField';
@@ -38,18 +35,14 @@ export default class SearchInputField extends React.Component<SearchInputFieldDe
     (this: any).doSearch = this.doSearch.bind(this);
   }
 
-  updateQuery(event: Event) {
-    if (event.target instanceof HTMLInputElement) {
-      const searcher = this.context.searcher;
-      searcher.updateQuery(event.target.value);
-    }
+  updateQuery(event: SyntheticEvent<HTMLInputElement>) {
+    const searcher = this.context.searcher;
+    searcher.updateQuery(event.currentTarget.value);
   }
 
-  keyPressed(event: Event) {
-    if (event.target instanceof HTMLInputElement) {
-      if (event.key === 'Enter') {
-        this.doSearch();
-      }
+  keyPressed(event: SyntheticKeyboardEvent<HTMLInputElement>) {
+    if (event.key === 'Enter') {
+      this.doSearch();
     }
   }
 

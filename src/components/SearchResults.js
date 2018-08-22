@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import FieldNames from '../api/FieldNames';
 
 import SearchResult from './SearchResult';
+import Searcher from './Searcher';
 import SearchDocument from '../api/SearchDocument';
 
 type SearchResultsProps = {
@@ -12,52 +13,43 @@ type SearchResultsProps = {
    * Optional. The location of the node through which to interact with Attivio.
    * Defaults to the value in the configuration.
    */
-  baseUri: string;
+  baseUri?: string;
   /** The format to use for displaying the individual documents. */
-  format: 'list' | 'usercard' | 'doccard' | 'debug' | 'simple';
+  format?: 'list' | 'usercard' | 'doccard' | 'debug' | 'simple';
   /**
    * Whether or not the documents’ relevancy scores should be displayed.
    * Defaults to false.
    */
-  showScores: boolean;
+  showScores?: boolean;
   /**
    * A map of the field names to the label to use for any entity fields.
-   * Defaults to show the people, locations, and companies entities.
+   * Defaults to show no entities.
    */
-  entityFields: Map<string, string>;
+  entityFields?: Map<string, string>;
   /** Whether tags should be shown in the UI or not. Defaults to true. */
-  showTags: boolean;
+  showTags?: boolean;
   /** Whether star ratings should be shown in the UI or not. Defaults to true. */
-  showRatings: boolean;
-  /** A style to apply to the results list */
-  style: ?any;
-};
-
-type SearchResultsDefaultProps = {
-  baseUri: string;
-  format: 'list' | 'usercard' | 'doccard' | 'debug' | 'simple';
-  showScores: boolean;
-  entityFields: Map<string, string>;
-  showTags: boolean;
-  showRatings: boolean;
+  showRatings?: boolean;
+  /** An optional style to apply to the results list */
+  style: any;
 };
 
 /**
  * A container for showing a list of documents from the search results.
  * This comes from the parent Searcher component.
  */
-export default class SearchResults extends React.Component<SearchResultsDefaultProps, SearchResultsProps, void> {
+export default class SearchResults extends React.Component<SearchResultsProps, void> {
   static defaultProps = {
     baseUri: '',
     format: 'list',
     showScores: false,
-    entityFields: new Map([['people', 'People'], ['locations', 'Locations'], ['companies', 'Companies']]),
+    entityFields: (new Map(): Map<string, string>),
     showTags: true,
     showRatings: true,
   };
 
   static contextTypes = {
-    searcher: PropTypes.any,
+    searcher: PropTypes.instanceOf(Searcher),
   };
 
   static displayName = 'SearchResults';

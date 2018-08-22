@@ -16,22 +16,16 @@ type AuthRouteProps = {
    * If a particular permission is required for this route, set it here.
    * Otherwise, any logged-in user can access the authenticated component.
    */
-  required: string | null;
+  required?: string;
   /**
    * Location shouldn't ever be set by the containing component, only
    * by the router.
    */
-  location: any;
+  location?: any;
   /**
-   * The authenticaton method being used
+   * The authentication method being used
    */
-  authType: 'SAML' | 'XML' | 'NONE';
-};
-
-type AuthRouteDefaultProps = {
-  required: string | null;
-  location: any;
-  authType: 'SAML' | 'XML' | 'NONE';
+  authType?: 'SAML' | 'XML' | 'NONE';
 };
 
 type AuthRouteState = {
@@ -39,9 +33,9 @@ type AuthRouteState = {
 };
 
 // LJV TODO Create a no-permissions page to use for unauthorized users
-class AuthRoute extends React.Component<AuthRouteDefaultProps, AuthRouteProps, AuthRouteState> {
+class AuthRoute extends React.Component<AuthRouteProps, AuthRouteState> {
   static defaultProps = {
-    required: null,
+    required: undefined,
     location: null, // This should be filled in by the router
     authType: 'NONE',
   };
@@ -68,7 +62,7 @@ class AuthRoute extends React.Component<AuthRouteDefaultProps, AuthRouteProps, A
   render() {
     // If the user is logged in and has permission for this
     // route, then just render the route.
-    if (AuthUtils.isLoggedIn(this.props.required)) {
+    if (AuthUtils.isLoggedIn(this.props.required || null)) {
       return (
         <Route
           {...this.props}

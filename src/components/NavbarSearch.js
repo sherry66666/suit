@@ -3,7 +3,7 @@ import React from 'react';
 
 type NavbarSearchProps = {
   /** The placeholder to show when the field is empty. Defaults to "Search…" */
-  placeholder: string;
+  placeholder?: string;
   /** The current value of the search field. */
   value: string;
   /** The function to call when the user changes the contents of the search field. */
@@ -12,16 +12,12 @@ type NavbarSearchProps = {
   onSearch: () => void;
 };
 
-type NavbarSearchDefaultProps = {
-  placeholder: string;
-};
-
 /**
  * A search bar to include inside a Navbar component. This isn't connected to
  * a Searcher component but is instead to be used for operations such as filtering.
  */
-export default class NavbarSearch extends React.Component<NavbarSearchDefaultProps, NavbarSearchProps, void> {
-  static defaultProps: NavbarSearchDefaultProps = {
+export default class NavbarSearch extends React.Component<NavbarSearchProps, void> {
+  static defaultProps = {
     placeholder: 'Search\u2026',
   };
 
@@ -46,7 +42,7 @@ export default class NavbarSearch extends React.Component<NavbarSearchDefaultPro
     }
   }
 
-  button: ?HTMLDivElement;
+  button: ?HTMLButtonElement;
 
   render() {
     return (

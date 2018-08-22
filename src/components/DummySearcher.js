@@ -1,51 +1,39 @@
 // @flow
-import React from 'react';
-import type { Children } from 'react';
+import * as React from 'react';
 
 import PropTypes from 'prop-types';
 
 import QueryResponse from '../api/QueryResponse';
 import FacetFilter from '../api/FacetFilter';
+import Searcher from './Searcher';
 
 type DummySearcherProps = {
-  defaultRelevancyModels: Array<string>;
-  defaultQueryLanguage: 'simple' | 'advanced';
-  defaultFormat: 'list' | 'usercard' | 'doccard' | 'debug' | 'simple';
-  defaultResultsPerPage: number;
-  defaultBusinessCenterProfile: string | null;
-  defaultSort: Array<string>;
-  defaultQuery: string;
-  defaultQueryResponse: QueryResponse | null;
-  defaultError: string | null;
-  children: Children;
-};
-
-type DummySearcherDefaultProps = {
-  defaultRelevancyModels: Array<string>;
-  defaultQueryLanguage: 'simple' | 'advanced';
-  defaultFormat: 'list' | 'usercard' | 'doccard' | 'debug' | 'simple';
-  defaultResultsPerPage: number;
-  defaultBusinessCenterProfile: string | null;
-  defaultSort: Array<string>;
-  defaultQuery: string;
-  defaultQueryResponse: QueryResponse | null;
-  defaultError: string | null;
+  defaultRelevancyModels?: Array<string>;
+  defaultQueryLanguage?: 'simple' | 'advanced';
+  defaultFormat?: 'list' | 'usercard' | 'doccard' | 'debug' | 'simple';
+  defaultResultsPerPage?: number;
+  defaultBusinessCenterProfile?: string;
+  defaultSort?: Array<string>;
+  defaultQuery?: string;
+  defaultQueryResponse?: QueryResponse;
+  defaultError?: string;
+  children: React.Node;
 };
 
 type DummySearcherState = {
   haveSearched: boolean;
-  response: QueryResponse | null;
-  error: string | null;
-  query: string;
-  queryLanguage: 'advanced' | 'simple';
-  sort: Array<string>,
-  relevancyModels: Array<string>;
+  response?: QueryResponse;
+  error?: string;
+  query?: string;
+  queryLanguage?: 'advanced' | 'simple';
+  sort?: Array<string>,
+  relevancyModels?: Array<string>;
   facetFilters: Array<FacetFilter>;
   geoFilters: Array<string>;
-  resultsPerPage: number;
+  resultsPerPage?: number;
   resultsOffset: number;
-  format: 'list' | 'usercard' | 'doccard' | 'debug' | 'simple';
-  businessCenterProfile: string | null;
+  format?: 'list' | 'usercard' | 'doccard' | 'debug' | 'simple';
+  businessCenterProfile?: string;
 };
 
 /**
@@ -55,7 +43,7 @@ type DummySearcherState = {
  * This isn't included in the index.js for SUIT because
  * YOU DO NOT WANT TO USE THIS COMPONENT IN YOUR APPLICATIONS!
  */
-export default class DummySearcher extends React.Component<DummySearcherDefaultProps, DummySearcherProps, DummySearcherState> {
+export default class DummySearcher extends React.Component<DummySearcherProps, DummySearcherState> {
   static defaultProps = {
     defaultRelevancyModels: ['default'],
     defaultQueryLanguage: 'simple',
@@ -63,13 +51,14 @@ export default class DummySearcher extends React.Component<DummySearcherDefaultP
     defaultResultsPerPage: 10,
     defaultBusinessCenterProfile: null,
     defaultSort: ['.score:DESC'],
+    searcher: PropTypes.instanceOf(Searcher),
     defaultQuery: '*:*',
     defaultQueryResponse: null,
     defaultError: null,
   };
 
   static childContextTypes = {
-    searcher: PropTypes.any,
+    searcher: PropTypes.instanceOf(Searcher),
   }
 
   constructor(props: DummySearcherProps) {
@@ -103,7 +92,7 @@ export default class DummySearcher extends React.Component<DummySearcherDefaultP
     };
   }
 
- /**
+  /**
    * Used to tell the search results component which format
    * to use when rendering results.
    */
@@ -120,7 +109,9 @@ export default class DummySearcher extends React.Component<DummySearcherDefaultP
    * and doesn't affect the state of the DummySearcher itself.
    */
   doCustomSearch(request: any, updateResults: (response: QueryResponse | null, error: string | null) => void) {
-    updateResults(this.props.defaultQueryResponse, this.props.defaultError);
+    const defaultQueryResponse = this.props.defaultQueryResponse ? this.props.defaultQueryResponse : null;
+    const defaultError = this.props.defaultError ? this.props.defaultError : null;
+    updateResults(defaultQueryResponse, defaultError);
   }
 
   /**
@@ -236,7 +227,7 @@ export default class DummySearcher extends React.Component<DummySearcherDefaultP
    * The search is reset to the first page when performed again.
    */
   updateSort(newSort: string) {
-    if (this.newSort !== this.state.sort) {
+    if (newSort !== this.state.sort) {
       let sort = this.state.sort;
       if (sort && sort.length > 0) {
         sort[0] = newSort;
@@ -350,7 +341,7 @@ export default class DummySearcher extends React.Component<DummySearcherDefaultP
    * again with the new page's offset.
    */
   changePage(newPage: number) {
-    const resultsPerPage = this.state.resultsPerPage;
+    const resultsPerPage = this.state.resultsPerPage ? this.state.resultsPerPage : 10;
     const oldOffset = this.state.resultsOffset;
     const newOffset = resultsPerPage * newPage;
     if (newOffset !== oldOffset) {

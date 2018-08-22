@@ -27,8 +27,8 @@ type WizardStepsProps = {
  * This component presents a series of pages which are used by the user, in sequence,
  * to enter data. The pages in the list can be enabled or disabled at any time.
  */
-export default class WizardSteps extends React.Component<void, WizardStepsProps, void> {
-  static WizardStep;
+export default class WizardSteps extends React.Component<WizardStepsProps, void> {
+  static WizardStep: typeof(WizardStep);
 
   render() {
     const pageLinks = [];
@@ -60,6 +60,7 @@ export default class WizardSteps extends React.Component<void, WizardStepsProps,
           style={stepStyle}
           key={step.key}
           className={classNames}
+          type="button"
         >
           {step.title}
         </button>

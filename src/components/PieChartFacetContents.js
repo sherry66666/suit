@@ -16,46 +16,37 @@ type PieChartFacetContentsProps = {
    * are present in the map's list of values and the entity names that are the keys in
    * the map are ignored.
    */
-  entityColors: Map<string, string>;
+  entityColors?: Map<string, string>;
   /**
    * Property representing horizontal alignment of the legend box within the chart area.
    * Optional values are left, right or center.
    * Default value is center.
    */
-  legendAlign: 'left' | 'right' | 'center';
+  legendAlign?: 'left' | 'right' | 'center';
   /**
    * Property representing how the individual items in the legend should be shown.
    * Optional values are horizontal or vertical.
    * Default value is horizontal.
    */
-  legendLayout: 'horizontal' | 'vertical';
+  legendLayout?: 'horizontal' | 'vertical';
   /**
    * Vertical alignment of the legend box relative to chart.
    * Optional values are top, middle or bottom.
    * Default value is bottom.
    */
-  legendVerticalAlign: 'top' | 'middle' | 'bottom';
+  legendVerticalAlign?: 'top' | 'middle' | 'bottom';
   /** Height of the Pie Chart. By default the height is set to 400px by Highcharts. */
-  height: string;
+  height?: string;
   /** Condition to enable or disable the click event for Pie Chart. By default it is set to true. */
-  clickable: boolean;
-};
-
-type PieChartFacetContentsDefaultProps = {
-  entityColors: Map<string, string>;
-  legendAlign: 'left' | 'right' | 'center';
-  legendLayout: 'horizontal' | 'vertical';
-  legendVerticalAlign: 'top' | 'middle' | 'bottom';
-  height: string;
-  clickable: boolean;
+  clickable?: boolean;
 };
 
 /**
  * Component to display the buckets of a facet using a pie chart.
  */
-export default class PieChartFacetContents extends React.Component<PieChartFacetContentsDefaultProps, PieChartFacetContentsProps, void> { // eslint-disable-line max-len
+export default class PieChartFacetContents extends React.Component<PieChartFacetContentsProps, void> { // eslint-disable-line max-len
   static defaultProps = {
-    entityColors: new Map(),
+    entityColors: (new Map(): Map<string, string>),
     legendAlign: 'center',
     legendLayout: 'horizontal',
     legendVerticalAlign: 'bottom',
@@ -97,9 +88,11 @@ export default class PieChartFacetContents extends React.Component<PieChartFacet
     });
 
     const colors = [];
-    this.props.entityColors.forEach((value: string) => {
-      colors.push(value);
-    });
+    if (this.props.entityColors) {
+      this.props.entityColors.forEach((value: string) => {
+        colors.push(value);
+      });
+    }
 
     const config = {
       chart: {
@@ -126,7 +119,7 @@ export default class PieChartFacetContents extends React.Component<PieChartFacet
             enabled: false,
           },
           events: {
-            click: (event: Event) => {
+            click: (event: any) => {
               if (this.props.clickable) {
                 if (event.point) {
                   this.clickWedge((event.point: any).index);

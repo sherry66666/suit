@@ -28,40 +28,30 @@ type NavigationHamburgerMenuProps = {
   /** The icon to display as the menu's button. It can be
    * the name of any Glyphicon icon. Defaults to the
    * hamburger menu icon (three horizontal bars). */
-  icon: string;
+  icon?: string;
   /** A descriptive tooltip for the menu shown when the user hovers over it. */
-  tooltip: string;
+  tooltip?: string;
   /** Where the tooltip should appear relative to the menu icon (defaults to below) */
-  tooltipPlacement: 'top' | 'left' | 'bottom' | 'right';
+  tooltipPlacement?: 'top' | 'left' | 'bottom' | 'right';
   /**
    * The list of items in the menu.
    */
   items: Array<NavMenuItem>;
   /** The currently active item’s route, if any. */
-  currentItem: string | null;
+  currentItem?: string;
   /**
    * The color to use for the hamburger menu. Can be any
    * valid css color (a name, a hex code, and rgb() value, etc.
    * Defaults to black.
    */
-  color: string;
+  color?: string;
   /**
    * The color to use for the menu button's background.
    * It defaults to transparent.
    */
-  backgroundColor: string;
+  backgroundColor?: string;
   /** An arbitrary style object to override any additional styles. */
-  style: any;
-};
-
-type NavigationHamburgerMenuDefaultProps = {
-  icon: string,
-  tooltip: string,
-  tooltipPlacement: 'top' | 'left' | 'bottom' | 'right';
-  currentItem: string | null;
-  color: string;
-  backgroundColor: string;
-  style: any;
+  style?: any;
 };
 
 /**
@@ -71,15 +61,15 @@ type NavigationHamburgerMenuDefaultProps = {
  * user clicks to reveal a menu of options. Clicking one takes the user to
  * that route.
  */
-class NavigationHamburgerMenu extends React.Component<NavigationHamburgerMenuDefaultProps, NavigationHamburgerMenuProps, void> { // eslint-disable-line max-len
+class NavigationHamburgerMenu extends React.Component<NavigationHamburgerMenuProps, void> { // eslint-disable-line max-len
   static defaultProps = {
     icon: 'menu-hamburger',
     tooltip: '',
     tooltipPlacement: 'bottom',
-    currentItem: null,
+    currentItem: undefined,
     color: '#000',
     backgroundColor: 'transparent',
-    style: null,
+    style: undefined,
   };
 
   static displayName = 'NavigationHamburgerMenu';

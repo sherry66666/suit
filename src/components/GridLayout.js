@@ -1,32 +1,17 @@
 // @flow
 
-import React from 'react';
-import type { Children } from 'react';
+import * as React from 'react';
 
 import Scrollable from './Scrollable';
 
 type GridLayoutProps = {
   /**
-   * Whether the grid should be laid out and scrollable
-   * in the horizontal direction (in a single row)
-   * Defaults to false.
-   */
-  oneRow: boolean;
-  /**
    * The contents that will be laid out.
    */
-  children: Children;
+  children: React.Node;
 };
 
-type GridLayoutDefaultProps = {
-  oneRow: boolean;
-};
-
-export default class GridLayout extends React.Component<GridLayoutDefaultProps, GridLayoutProps, void> {
-  static defaultProps = {
-    oneRow: false,
-  };
-
+export default class GridLayout extends React.Component<GridLayoutProps, void> {
   static displayName = 'GridLayout';
 
   render() {

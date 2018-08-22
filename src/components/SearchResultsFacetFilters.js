@@ -2,11 +2,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import Searcher from './Searcher';
 import NavbarFilter from './NavbarFilter';
 
-export default class SearchResultsFacetFilters extends React.Component<void, {}, void> {
+export default class SearchResultsFacetFilters extends React.Component<{}, void> {
   static contextTypes = {
-    searcher: PropTypes.any,
+    searcher: PropTypes.instanceOf(Searcher),
   };
 
   static displayName = 'SearchResultsFacetFilters';

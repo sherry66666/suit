@@ -11,24 +11,18 @@ type ListWithBarsFacetContentsProps = {
   /** Callback to add a filter for this facet. */
   addFacetFilter: (bucket: SearchFacetBucket) => void;
   /** If set, the labels column will be right-aligned */
-  right: boolean;
+  right?: boolean;
   /** If set, then the bars will be this color as opposed to the default blue */
-  color: string;
+  color?: string;
   /** boolean condition to remove hyperlinks from labels and show them as plain text */
-  noLink: boolean;
-};
-
-type ListWithBarsFacetContentsDefaultProps = {
-  right: boolean;
-  color: string;
-  noLink: boolean;
+  noLink?: boolean;
 };
 
 /**
  * Component to display the buckets of a facet in a table with
- * horizontal bars showing relatrive size.
+ * horizontal bars showing relative size.
  */
-export default class ListWithBarsFacetContents extends React.Component<ListWithBarsFacetContentsDefaultProps, ListWithBarsFacetContentsProps, void> { // eslint-disable-line max-len
+export default class ListWithBarsFacetContents extends React.Component<ListWithBarsFacetContentsProps, void> {
   static defaultProps = {
     right: false,
     color: '#55B3E3',
@@ -48,9 +42,9 @@ export default class ListWithBarsFacetContents extends React.Component<ListWithB
       const label = bucket.displayLabel();
       const percent = Math.round((bucket.count / maxValue) * 100);
       const percentage = `${percent}%`;
-      const callback = (event: Event & { target: HTMLAnchorElement }) => {
+      const callback = (event: SyntheticEvent<HTMLAnchorElement>) => {
         this.props.addFacetFilter(bucket);
-        event.target.blur();
+        event.currentTarget.blur();
       };
       const labelValue = this.props.noLink ? (
         <span>

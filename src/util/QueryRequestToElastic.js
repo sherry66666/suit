@@ -1,10 +1,16 @@
 // @flow
 
 import ElasticToQueryResponse from './ElasticToQueryResponse';
+import FacetFilter from '../api/FacetFilter';
 
 export default class QueryRequestToElastic {
   static convert(qr: any, baseUri: string, customOptions: any, callback: any) {
-    const { query, rows = 0, sort = ['.score:DESC'], facetFilters } = qr;
+    const {
+      query,
+      rows = 0,
+      sort = ['.score:DESC'],
+      facetFilters,
+    } = qr;
     const { offset = ['0'] } = qr.restParams;
 
     const body = JSON.stringify({
@@ -40,7 +46,7 @@ export default class QueryRequestToElastic {
       .catch((e) => { return callback(`Error: ${e}`); });
   }
 
-  static buildQuery(query, facetFilters) {
+  static buildQuery(query: string, facetFilters: Array<FacetFilter>) {
     if (facetFilters.length === 0) {
       return query;
     }
@@ -55,7 +61,7 @@ export default class QueryRequestToElastic {
     return aggs;
   }
 
-  static buildSort(sort, customConfig) {
+  static buildSort(sort: Array<string>, customConfig: any) {
     if (sort.length === 0) {
       return [];
     }

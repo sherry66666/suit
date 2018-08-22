@@ -3,30 +3,26 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import ToggleSwitch from './ToggleSwitch';
+import Searcher from './Searcher';
 
 type SearchDebugToggleProps = {
   /** The label to show for the menu. Defaults to "Details:". */
-  label: string,
+  label?: string,
   /** If set, then the menu will be shown at the right end of the navbar. */
-  right: boolean;
-}
-
-type SearchDebugToggleDefaultProps = {
-  label: string,
-  right: boolean;
+  right?: boolean;
 }
 
 /**
  * A toggle switch for deciding whether the search results should be shown in debug format.
  */
-export default class SearchDebugToggle extends React.Component<SearchDebugToggleDefaultProps, SearchDebugToggleProps, void> { // eslint-disable-line max-len
+export default class SearchDebugToggle extends React.Component<SearchDebugToggleProps, void> {
   static defaultProps = {
     label: 'Details:',
     right: false,
   };
 
   static contextTypes = {
-    searcher: PropTypes.any,
+    searcher: PropTypes.instanceOf(Searcher),
   };
 
   static displayName = 'SearchDebugToggle';

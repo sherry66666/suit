@@ -1,6 +1,6 @@
 // @flow
 
-import React, { Children } from 'react';
+import * as React from 'react';
 import PropTypes from 'prop-types';
 
 type ConfigurationProps = {
@@ -10,12 +10,12 @@ type ConfigurationProps = {
    * Any child components can access the configuration's settings
    * using the "configuration" object in their context
    */
-  children: Children;
+  children: React.Node;
 };
 
-export default class Configuration extends React.Component<void, ConfigurationProps, any> {
+export default class Configuration extends React.Component<ConfigurationProps, any> {
   static childContextTypes = {
-    configuration: PropTypes.any,
+    configuration: PropTypes.instanceOf(Configuration),
   }
 
   static displayName = 'Configuration';

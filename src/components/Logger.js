@@ -8,10 +8,10 @@ type LoggerProps = {
    * Optional. The location of the node through which to interact with Attivio.
    * Defaults to the value in the configuration.
    */
-  baseUri: string;
+  baseUri?: string;
 }
 
-class Logger extends React.Component<LoggerProps, LoggerProps, void> {
+class Logger extends React.Component<LoggerProps, void> {
   static defaultProps = {
     baseUri: '',
   }
@@ -59,7 +59,8 @@ class Logger extends React.Component<LoggerProps, LoggerProps, void> {
       body,
     };
 
-    const uri = `${this.props.baseUri}/rest/loggingApi/log`;
+    const baseUri = this.props.baseUri ? this.props.baseUri : '';
+    const uri = `${baseUri}/rest/loggingApi/log`;
     const request = new Request(uri, params);
     fetch(request).then((result: Response) => {
       if (!result.ok) {

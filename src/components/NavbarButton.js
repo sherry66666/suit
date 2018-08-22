@@ -6,19 +6,14 @@ import Glyphicon from 'react-bootstrap/lib/Glyphicon';
 
 type NavbarButtonProps = {
   /** The button's label. Optional—if not set, the button will only have an icon. */
-  label: string | null;
+  label?: string;
   /**
    * The icon to display for the button. This should be the name of an icon in the
-   * set of Glyphicons halflings (see here: )
+   * set of Glyphicons halflings
    * Optional—if not set, the button will only have a text label. */
-  icon: string | null;
+  icon?: string;
   /** The callback for when the button is clicked. */
   onClick: () => void;
-};
-
-type NavbarButtonDefaultProps = {
-  label: string | null;
-  icon: string | null;
 };
 
 /**
@@ -26,7 +21,7 @@ type NavbarButtonDefaultProps = {
  * (It needs to at least have one or the other, though.) Clicking the butotn calls
  * the onClick handler.
  */
-export default class NavbarButton extends React.Component<NavbarButtonDefaultProps, NavbarButtonProps, void> {
+export default class NavbarButton extends React.Component<NavbarButtonProps, void> {
   static defaultProps = {
     label: '',
     icon: null,

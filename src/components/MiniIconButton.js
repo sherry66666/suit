@@ -18,21 +18,16 @@ type MiniIconButtonProps = {
    * and click the "Halflings" tab to see the options
    * avaialble (without the "halflings-" prefix).
    */
-  glyph: string | null;
+  glyph?: string;
   /**
    * The URI of the image to use for the button. Only used
    * if glyph is not set. You must use one or the other of
    * the glyph and uri properties.
    */
-  uri: string | null;
+  uri?: string;
 };
 
-type MiniIconButtonDefaultProps = {
-  glyph: string | null;
-  uri: string | null;
-};
-
-export default class MiniIconButton extends React.Component<MiniIconButtonDefaultProps, MiniIconButtonProps, void> {
+export default class MiniIconButton extends React.Component<MiniIconButtonProps, void> {
   static defaultProps = {
     glyph: null,
     uri: null,
@@ -77,6 +72,7 @@ export default class MiniIconButton extends React.Component<MiniIconButtonDefaul
         ref={(c) => {
           this.button = c;
         }}
+        type="button"
       >
         {contents}
       </button>

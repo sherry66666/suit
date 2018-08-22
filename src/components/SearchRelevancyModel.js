@@ -4,30 +4,30 @@ import PropTypes from 'prop-types';
 import axios from 'axios';
 
 import Menu, { MenuItemDef } from './Menu';
+import Searcher from './Searcher';
 
 type SearchRelevancyModelProps = {
   /**
-   * The list of relevancy models to show that will be availale for the user
+   * The list of relevancy models to show that will be available for the user
    * to choose from. If this is set to a single-element array, then that one
    * relevancy model will be used for all queries and the user will not see
-   * a menu for choosing the model. If this is not set (and the value is the
-   * default, empty array), then the back-end will be queried to obtain the list
-   * of known model names.
+   * a menu for choosing the model. If this is not set then the back-end will
+   * be queried to obtain the list of known model names.
    */
-  models: Array<string>;
+  models?: Array<string>;
   /** If set, then the menu will be shown at the right end of the navbar. */
-  right: boolean;
+  right?: boolean;
   /**
    * Optional. The location of the node through which to interact with Attivio.
    * Defaults to the value in the configuration.
    */
-  baseUri: string;
+  baseUri?: string;
 };
 
 type SearchRelevancyModelState = {
   models: Array<string>;
   loading: boolean;
-  errorMessage: string | null;
+  errorMessage?: string;
 };
 
 /**
@@ -35,15 +35,15 @@ type SearchRelevancyModelState = {
  * on each page. It works with the parent Searcher component to
  * update its property and to show the current value.
  */
-export default class SearchRelevancyModel extends React.Component<SearchRelevancyModelProps, SearchRelevancyModelProps, SearchRelevancyModelState> { // eslint-disable-line max-len
+export default class SearchRelevancyModel extends React.Component<SearchRelevancyModelProps, SearchRelevancyModelState> { // eslint-disable-line max-len
   static defaultProps = {
-    models: [],
+    models: undefined,
     right: false,
     baseUri: '',
   };
 
   static contextTypes = {
-    searcher: PropTypes.any,
+    searcher: PropTypes.instanceOf(Searcher),
   };
 
   static displayName = 'SearchRelevancyModel';
@@ -51,9 +51,8 @@ export default class SearchRelevancyModel extends React.Component<SearchRelevanc
   constructor(props: SearchRelevancyModelProps) {
     super(props);
     this.state = {
-      models: this.props.models,
-      loading: this.props.models.length === 0,
-      errorMessage: null,
+      models: this.props.models ? this.props.models : [],
+      loading: !this.props.models,
     };
     (this: any).onSelect = this.onSelect.bind(this);
   }
@@ -63,7 +62,7 @@ export default class SearchRelevancyModel extends React.Component<SearchRelevanc
   componentWillMount() {
     // If our parent didn't set a list of models for us
     // to use, ask the server what we should do.
-    const uri = `${this.props.baseUri}/rest/relevancyModelApi/getRelevancyModelNames`;
+    const uri = `${this.props.baseUri || ''}/rest/relevancyModelApi/getRelevancyModelNames`;
     if (!this.state.models || this.state.models.length === 0) {
       axios.get(uri).then((response) => {
         if (response && response.data && response.data.length > 0) {
@@ -78,13 +77,13 @@ export default class SearchRelevancyModel extends React.Component<SearchRelevanc
           this.setState({
             models: response.data,
             loading: false,
-            errorMessage: null,
+            errorMessage: undefined,
           });
         } else {
           this.setState({
             models: [],
             loading: false,
-            errorMessage: null,
+            errorMessage: undefined,
           });
         }
       }).catch((error) => {

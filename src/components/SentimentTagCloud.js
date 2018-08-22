@@ -8,9 +8,9 @@ export class SentimentTagCloudValue {
   /** The value for this item. */
   value: number;
   /** The sentiment for this item. */
-  sentiment: string;
+  sentiment: 'positive' | 'negative';
 
-  constructor(label: string, value: number, sentiment: string) {
+  constructor(label: string, value: number, sentiment: 'positive' | 'negative') {
     this.label = label;
     this.value = value;
     this.sentiment = sentiment;
@@ -27,7 +27,7 @@ type SentimentTagCloudProps = {
    * are more than this many items, only this many, with the highest
    * value fields, will be shown. Defaults to 15.
    */
-  maxValues: number;
+  maxValues?: number;
   /**
    * A function that will get called with the selected SentimentTagCloudValue
    * object if one is clicked.
@@ -35,31 +35,28 @@ type SentimentTagCloudProps = {
   callback: (tcv: SentimentTagCloudValue) => void;
 };
 
-type SentimentTagCloudDefaultProps = {
-  maxValues: number;
-};
-
 /**
  * Display a linear tag "cloud" where the items are proportionally sized
  * based on an associated value.
  */
-export default class SentimentTagCloud extends React.Component<SentimentTagCloudDefaultProps, SentimentTagCloudProps, void> {
+export default class SentimentTagCloud extends React.Component<SentimentTagCloudProps, void> {
   static defaultProps = {
     maxValues: 15,
   };
 
   static displayName = 'SentimentTagCloud';
 
-  static SentimentTagCloudValue;
+  static SentimentTagCloudValue: typeof(SentimentTagCloudValue);
 
-  static mapRange(num, sentiment) {
+  static mapRange(num: number, sentiment: 'positive' | 'negative') {
     if (sentiment === 'positive') {
       const inMin = 1;
       const inMax = 8;
       const outMin = 6;
       const outMax = 10;
       return (((num - inMin) * (outMax - outMin)) / (inMax - inMin)) + outMin;
-    } else if (sentiment === 'negative') {
+    }
+    if (sentiment === 'negative') {
       const inMin = 1;
       const inMax = 8;
       const outMin = 1;
@@ -69,7 +66,7 @@ export default class SentimentTagCloud extends React.Component<SentimentTagCloud
     return -1;
   }
 
-  static getAdjustedValue(value: number, max: number, sentiment: string): number {
+  static getAdjustedValue(value: number, max: number, sentiment: 'positive' | 'negative'): number {
     const ratio = value / max;
     const timesSeven = ratio * 7;
     const oneThroughEight = Math.round(timesSeven) + 1;
@@ -81,10 +78,9 @@ export default class SentimentTagCloud extends React.Component<SentimentTagCloud
     let tagCloudValues = this.props.positiveTags.concat(this.props.negativeTags);
     const maxValue = tagCloudValues.reduce((max, tcv) => {
       return Math.max(tcv.value, max);
-    }, 0,
-    );
+    }, 0);
 
-    if (tagCloudValues.length > this.props.maxValues) {
+    if (!this.props.maxValues || tagCloudValues.length > this.props.maxValues) {
       // Sort numerically by value
       tagCloudValues.sort((tcv1: SentimentTagCloudValue, tcv2: SentimentTagCloudValue) => {
         if (tcv1.value === tcv2.value) {
@@ -106,9 +102,9 @@ export default class SentimentTagCloud extends React.Component<SentimentTagCloud
 
     const cloudItems = tagCloudValues.map((tcv) => {
       const size = SentimentTagCloud.getAdjustedValue(tcv.value, maxValue, tcv.sentiment);
-      const callback = (event: Event & { target: HTMLAnchorElement }) => {
+      const callback = (event: SyntheticEvent<HTMLAnchorElement>) => {
         this.props.callback(tcv);
-        event.target.blur();
+        event.currentTarget.blur();
       };
       return (
         <li key={tcv.label}>

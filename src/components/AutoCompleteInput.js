@@ -8,27 +8,26 @@ import { RootCloseWrapper } from 'react-overlays';
 import FetchUtils from '../util/FetchUtils';
 
 type AutoCompleteInputProps = {
-  id: string;
+  /** An optional ID for the input component. */
+  id?: string;
+  /** The URI to use to obtain the autocomplete list.  */
   uri: string | null;
+  /** A callback used when the value has changed. */
   updateValue: (newValue: string, doSearch: boolean) => void;
-  placeholder: string;
-  value: string;
-  disabled: boolean;
-  className: string;
-  style: any;
-};
-
-type AutoCompleteInputDefaultProps = {
-  id: string;
-  placeholder: string;
-  value: string;
-  disabled: boolean;
-  className: string;
-  style: any;
+  /** Optional Placeholder text for the input component. */
+  placeholder?: string;
+  /** The value to display in the input field. */
+  value?: string;
+  /** If set, the input will be disabled. */
+  disabled?: boolean;
+  /** An optional class name added to the input component. */
+  className?: string;
+  /** Optional style information added to the input component. */
+  style?: any;
 };
 
 type AutoCompleteInputState = {
-  isLoading: boolean;
+  loading: boolean;
   suggestions: Array<string>;
   error: string;
   open: boolean;
@@ -36,9 +35,9 @@ type AutoCompleteInputState = {
   queryValue: string;
 };
 
-const isIE11 = !(window.ActiveXObject) && 'ActiveXObject' in window;
+// const isIE11 = !(window.ActiveXObject) && 'ActiveXObject' in window;
 
-export default class AutoCompleteInput extends React.Component<AutoCompleteInputDefaultProps, AutoCompleteInputProps, AutoCompleteInputState> { // eslint-disable-line max-len
+export default class AutoCompleteInput extends React.Component<AutoCompleteInputProps, AutoCompleteInputState> { // eslint-disable-line max-len
   static defaultProps = {
     id: 'autocomplete',
     placeholder: '',
@@ -53,19 +52,19 @@ export default class AutoCompleteInput extends React.Component<AutoCompleteInput
   // Start looking for autocomplete values when there are at least 3 characters in the input field
   static AUTOCOMPLETE_THRESHOLD = 2;
 
-  static getInputOnChangeProps(handler) {
-    return isIE11 ? { onInput: handler } : { onChange: handler };
-  }
+  // static getInputOnChangeProps(handler) {
+  //   return isIE11 ? { onInput: handler } : { onChange: handler };
+  // }
 
   constructor(props: AutoCompleteInputProps) {
     super(props);
     this.state = {
-      isLoading: false,
+      loading: false,
       suggestions: [],
       error: '',
       open: false,
       cursor: -1,
-      queryValue: this.props.value,
+      queryValue: this.props.value || '',
     };
     (this: any).closeMenu = this.closeMenu.bind(this);
     (this: any).handleChange = this.handleChange.bind(this);
@@ -90,14 +89,14 @@ export default class AutoCompleteInput extends React.Component<AutoCompleteInput
 
   closeMenu() {
     this.setState({
-      isLoading: false,
+      loading: false,
       suggestions: [],
       error: '',
       cursor: -1,
     });
   }
 
-  handleChange(event: Event & { currentTarget: HTMLInputElement }) {
+  handleChange(event: SyntheticEvent<HTMLInputElement>) {
     const query = event.currentTarget.value;
     this.props.updateValue(query, false);
     if (query && query.length > AutoCompleteInput.AUTOCOMPLETE_THRESHOLD) {
@@ -105,7 +104,7 @@ export default class AutoCompleteInput extends React.Component<AutoCompleteInput
       if (uri) {
         const encodedValue = encodeURIComponent(query);
         this.setState({
-          isLoading: true,
+          loading: true,
           open: true,
           error: '',
           suggestions: [],
@@ -119,14 +118,14 @@ export default class AutoCompleteInput extends React.Component<AutoCompleteInput
             }) : [];
             const open = suggestions.length > 0;
             this.setState({
-              isLoading: false,
+              loading: false,
               suggestions,
               error: '',
               open,
             });
           } else if (errorString) {
             this.setState({
-              isLoading: false,
+              loading: false,
               suggestions: [],
               error: errorString,
               open: errorString.length > 0,
@@ -137,7 +136,7 @@ export default class AutoCompleteInput extends React.Component<AutoCompleteInput
       }
     } else {
       this.setState({
-        isLoading: false,
+        loading: false,
         suggestions: [],
         error: '',
         open: false,
@@ -146,7 +145,7 @@ export default class AutoCompleteInput extends React.Component<AutoCompleteInput
     }
   }
 
-  doKeyPress(event: Event & { currentTarget: HTMLInputElement, keyCode: number }) {
+  doKeyPress(event: SyntheticKeyboardEvent<HTMLInputElement>) {
     const { suggestions } = this.state;
     // This condition is satisfied when a user presses the enter key.
     if (event.keyCode === 13) {
@@ -213,7 +212,7 @@ export default class AutoCompleteInput extends React.Component<AutoCompleteInput
             className={this.props.className}
             style={this.props.style}
             disabled={this.props.disabled}
-            {...AutoCompleteInput.getInputOnChangeProps(this.handleChange)}
+            onChange={this.handleChange}
             onKeyDown={this.doKeyPress}
           />
           <Dropdown.Toggle

@@ -2,19 +2,13 @@ import React from 'react';
 
 type StarRatingProps = {
   /** The number of stars to show, from 0 to 5. */
-  stars: number,
+  stars?: number,
   /**
    * If provided, the user will be able to assign their own rating
    * and this function will be called when that has happened. If this
    * is not set, then the star rating will be purely for display.
    */
-  onRated: null | (starRating: 1 | 2 | 3 | 4 | 5) => void;
-};
-
-type StarRatingDefaultProps = {
-  stars: number,
-  chooseable: boolean,
-  onRated: null | (starRating: 1 | 2 | 3 | 4 | 5) => void;
+  onRated?: (starRating: 1 | 2 | 3 | 4 | 5) => void;
 };
 
 type StarRatingState = {
@@ -29,13 +23,15 @@ type StarRatingState = {
  * the enclosing Searcher to apply the value to the document in the
  * index.
  */
-export default class StarRating extends React.Component<StarRatingDefaultProps, StarRatingProps, StarRatingState> {
+export default class StarRating extends React.Component<StarRatingProps, StarRatingState> {
   static defaultProps = {
     stars: 0,
     onRated: null,
   };
 
   static displayName = 'StarRating';
+
+  starDivElems: Array<?HTMLDivElement> = [];
 
   constructor(props: StarRatingProps) {
     super(props);
@@ -61,8 +57,6 @@ export default class StarRating extends React.Component<StarRatingDefaultProps, 
       });
     });
   }
-
-  starDivElems: Array<?HTMLDivElement> = [];
 
   render() {
     const origStars = this.state.stars;

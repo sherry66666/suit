@@ -6,25 +6,19 @@ type ToggleSwitchProps = {
   /** Whether the switch is in the “on” position. */
   on: boolean;
   /** A label to show for the “on” position. Defaults to “On”. */
-  onLabel: string;
+  onLabel?: string;
   /** A label to show for the “off” position. Defaults to “Off”. */
-  offLabel: string;
+  offLabel?: string;
   /** A callback used when the switch is toggled. */
   onChange: (newValue: boolean) => void;
   /** If set, the toggle switch is disabled. */
-  disabled: boolean;
-};
-
-type ToggleSwitchDefaultProps = {
-  onLabel: string;
-  offLabel: string;
-  disabled: boolean;
+  disabled?: boolean;
 };
 
 /**
  * This is a simple “sliding” toggle switch with customizable labels.
  */
-export default class ToggleSwitch extends React.Component<ToggleSwitchDefaultProps, ToggleSwitchProps, void> {
+export default class ToggleSwitch extends React.Component<ToggleSwitchProps, void> {
   static defaultProps = {
     onLabel: 'On',
     offLabel: 'Off',

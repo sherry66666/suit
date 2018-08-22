@@ -1,22 +1,15 @@
 // @flow
-import React from 'react';
-import type { Children } from 'react';
+import * as React from 'react';
 
 type MoreListProps = {
   /** Arbirary childen. */
-  children: Children;
+  children: React.Node;
   /** The maximum number of children to display initially. */
-  shortSize: number;
+  shortSize?: number;
   /** The prompt for displaying more children. Defaults to "More…" */
-  morePrompt: string;
+  morePrompt?: string;
   /** The prompt for displaying fewer children. Defaults to "Fewer…" */
-  fewerPrompt: string;
-}
-
-type MoreListDefaultProps = {
-  shortSize: number;
-  morePrompt: string;
-  fewerPrompt: string;
+  fewerPrompt?: string;
 }
 
 type MoreListState = {
@@ -32,7 +25,7 @@ type MoreListState = {
  *
  * Depends on CSS classes: more-list-link
  */
-export default class MoreList extends React.Component<MoreListDefaultProps, MoreListProps, MoreListState> {
+export default class MoreList extends React.Component<MoreListProps, MoreListState> {
   static defaultProps = {
     shortSize: 5,
     morePrompt: 'More\u2026',

@@ -10,22 +10,18 @@ import StringUtils from '../util/StringUtils';
 
 type DocumentPreviewProps = {
   uris: Array<string>;
-  docTitle: string | null;
+  docTitle?: string;
   show: boolean;
   onClose: () => void;
-};
-
-type DocumentPreciewDefaultProps = {
-  docTitle: string | null;
 };
 
 type DocumentPreviewState = {
   currentItem: number;
 };
 
-export default class DocumentPreview extends React.Component<DocumentPreciewDefaultProps, DocumentPreviewProps, DocumentPreviewState> { // eslint-disable-line max-len
+export default class DocumentPreview extends React.Component<DocumentPreviewProps, DocumentPreviewState> {
   static defaultProps = {
-    docTitle: null,
+    docTitle: undefined,
   };
 
   constructor(props: DocumentPreviewProps) {

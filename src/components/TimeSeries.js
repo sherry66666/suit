@@ -35,27 +35,21 @@ type TimeSeriesProps = {
    * If set, then an area chart will be drawn (a line with a filled
    * area below it. Otherwise, a column chart will be drawn.
    */
-  area: boolean;
+  area?: boolean;
   /** The y-axis key. Optional */
-  yKey: string | null;
+  yKey?: string;
   /** The x-axis key. Optional */
-  xKey: string | null;
-};
-
-type TimeSeriesDefaultProps = {
-  area: boolean;
-  yKey: string | null;
-  xKey: string | null;
+  xKey?: string;
 };
 
 /**
  * Component to display a chart of values over time
  */
-export default class TimeSeries extends React.Component<TimeSeriesDefaultProps, TimeSeriesProps, void> {
+export default class TimeSeries extends React.Component<TimeSeriesProps, void> {
   static defaultProps = {
     area: false,
-    xKey: null,
-    yKey: null,
+    xKey: undefined,
+    yKey: undefined,
   };
 
   static displayName = 'TimeSeries';
@@ -68,13 +62,16 @@ export default class TimeSeries extends React.Component<TimeSeriesDefaultProps, 
     if (resolution >= 365 * 24 * 60 * 60 * 1000) {
       return `${DateUtils.formatDate(self.point.x, DateFormat.LONG_YEAR)}${yDisplay}`;
     // month
-    } else if (resolution >= 28 * 24 * 60 * 60 * 1000) {
+    }
+    if (resolution >= 28 * 24 * 60 * 60 * 1000) {
       return `${DateUtils.formatDate(self.point.x, DateFormat.LONG_MONTH)}${yDisplay}`;
     // week
-    } else if (resolution >= 7 * 24 * 60 * 60 * 1000) {
+    }
+    if (resolution >= 7 * 24 * 60 * 60 * 1000) {
       return `${DateUtils.formatDate(self.x, DateFormat.MEDIUM_DATE)} - ${DateUtils.formatDate(self.point.endDate, DateFormat.MEDIUM_DATE)}${yDisplay}`; // eslint-disable-line max-len
     // day
-    } else if (resolution >= 24 * 60 * 60 * 1000) {
+    }
+    if (resolution >= 24 * 60 * 60 * 1000) {
       return `${DateUtils.formatDate(self.point.x, DateFormat.MEDIUM_DATE)}${yDisplay}`;
     }
     // default (time)

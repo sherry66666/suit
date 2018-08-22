@@ -5,31 +5,27 @@ import { withRouter } from 'react-router-dom';
 import QueryString from 'query-string';
 import Glyphicon from 'react-bootstrap/lib/Glyphicon';
 
+import Searcher from './Searcher';
+
 type SearchResultTagsProps = {
   location: PropTypes.object.isRequired;
   history: PropTypes.object.isRequired;
   /** The list of tags on the document. */
   tags: Array<string>;
   /** If set, the list is rendered in a vertical column. */
-  vertical: boolean;
+  vertical?: boolean;
   /**
    * The query to execute to see similar documents. If not set,
    * no "More Like This" link is displayed.
    */
-  moreLikeThisQuery: string;
+  moreLikeThisQuery?: string;
   /** The document’s ID, needed for adding/removing tags. */
   docId: string;
   /**
    * The label to show for the link to the 360 page for the document.
    * Set to null to not show a link. Defaults to "Show 360° View."
    */
-  view360Label: string | null;
-};
-
-type SearchResultTagsDefaultProps = {
-  moreLikeThisQuery: string;
-  vertical: boolean;
-  view360Label: string | null;
+  view360Label?: string;
 };
 
 type SearchResultTagsState = {
@@ -47,9 +43,9 @@ type SearchResultTagsState = {
  * in a single column as opposed to in a horizontal row. Also allows
  * the user to add additional tags by clicking the Add button.
  */
-class SearchResultTags extends React.Component<SearchResultTagsDefaultProps, SearchResultTagsProps, SearchResultTagsState> { // eslint-disable-line max-len
+class SearchResultTags extends React.Component<SearchResultTagsProps, SearchResultTagsState> { // eslint-disable-line max-len
   static contextTypes = {
-    searcher: PropTypes.any,
+    searcher: PropTypes.instanceOf(Searcher),
   };
 
   static defaultProps = {
@@ -124,31 +120,27 @@ class SearchResultTags extends React.Component<SearchResultTagsDefaultProps, Sea
     }
   }
 
-  updateNewTag(event: Event) {
-    if (event.target instanceof HTMLInputElement) {
+  updateNewTag(event: SyntheticEvent<HTMLInputElement>) {
+    this.setState({
+      newTag: event.currentTarget.value,
+    });
+  }
+
+  keyUp(event: SyntheticKeyboardEvent<HTMLInputElement>) {
+    if (event.key === 'Enter') {
+      // If the user presses enter, then add the new tag
+      this.addTag();
+    } else if (event.key === 'Escape') {
+      // Otherwise, if the press escape, to back to showing the Add… link instead of the input field
       this.setState({
-        newTag: event.target.value,
+        newTag: '',
+        adding: false,
       });
     }
   }
 
-  keyUp(event: Event) {
-    if (event.target instanceof HTMLInputElement) {
-      if (event.key === 'Enter') {
-        // If the user presses enter, then add the new tag
-        this.addTag();
-      } else if (event.key === 'Escape') {
-        // Otherwise, if the press escape, to back to showing the Add… link instead of the input field
-        this.setState({
-          newTag: '',
-          adding: false,
-        });
-      }
-    }
-  }
-
   moreLikeThis() {
-    if (this.context.searcher) {
+    if (this.context.searcher && this.props.moreLikeThisQuery) {
       this.context.searcher.performQueryImmediately(this.props.moreLikeThisQuery, true);
     }
   }
@@ -163,17 +155,16 @@ class SearchResultTags extends React.Component<SearchResultTagsDefaultProps, Sea
 
   render() {
     const outerDivClassName = `attivio-tags ${this.props.vertical ? 'attivio-tags-vertical' : ''}`;
-    const moreLikeThisComponent =
-      this.props.moreLikeThisQuery.length > 0 ? (
-        <a
-          className="attivio-tags-more"
-          onClick={this.moreLikeThis}
-          role="button"
-          tabIndex={0}
-        >
-          More like this
-        </a>
-      ) : '';
+    const moreLikeThisComponent = this.props.moreLikeThisQuery ? (
+      <a
+        className="attivio-tags-more"
+        onClick={this.moreLikeThis}
+        role="button"
+        tabIndex={0}
+      >
+        More like this
+      </a>
+    ) : '';
     let tagList;
     if (this.state.tags.length > 0) {
       tagList = this.state.tags.map((tag) => {
@@ -201,7 +192,9 @@ class SearchResultTags extends React.Component<SearchResultTagsDefaultProps, Sea
     const extra = this.state.adding ? (
       <div className="form-inline attivio-tags-form">
         <div className="form-group">
-          <label htmlFor="attivio-tags-more-add" className="sr-only">Tag</label>
+          <label htmlFor="attivio-tags-more-add" className="sr-only">
+            Tag
+          </label>
           <input
             type="email"
             className="form-control"

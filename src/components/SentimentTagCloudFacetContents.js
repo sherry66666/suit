@@ -21,7 +21,7 @@ type SentimentTagCloudFacetContentsProps = {
 };
 
 /** Display the values for positive and negative keyphrases in a list with TagClouds. */
-export default class SentimentTagCloudFacetContents extends React.Component<void, SentimentTagCloudFacetContentsProps, void> {
+export default class SentimentTagCloudFacetContents extends React.Component<SentimentTagCloudFacetContentsProps, void> {
   static displayName = 'SentimentTagCloudFacetContents';
 
   // Check if keyphrase bucket is a part of keyphrase bucketList
@@ -36,9 +36,11 @@ export default class SentimentTagCloudFacetContents extends React.Component<void
         if (bucketList[i].count < currentBucket.count) {
           currentBucket.count -= bucketList[i].count;
           return currentBucket;
-        } else if (bucketList[i].count > currentBucket.count) {
+        }
+        if (bucketList[i].count > currentBucket.count) {
           return null;
-        } else if (bucketList[i].count === currentBucket.count) {
+        }
+        if (bucketList[i].count === currentBucket.count) {
           return currentBucket;
         }
       }
@@ -90,11 +92,13 @@ export default class SentimentTagCloudFacetContents extends React.Component<void
       }
     });
 
-    return (<SentimentTagCloud
-      positiveTags={positiveTagCloudValues}
-      negativeTags={negativeTagCloudValues}
-      maxValues={this.props.maxBuckets}
-      callback={this.tagCloudCallback}
-    />);
+    return (
+      <SentimentTagCloud
+        positiveTags={positiveTagCloudValues}
+        negativeTags={negativeTagCloudValues}
+        maxValues={this.props.maxBuckets}
+        callback={this.tagCloudCallback}
+      />
+    );
   }
 }

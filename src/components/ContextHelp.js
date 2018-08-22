@@ -28,10 +28,10 @@ type ContextHelpProps = {
 /**
  * Component to display contextual help.
  */
-export default class ContextHelp extends React.Component<void, ContextHelpProps, void> {
+export default class ContextHelp extends React.Component<ContextHelpProps, void> {
   static displayName = 'ContextHelp';
 
-  static ContextHelpInfo;
+  static ContextHelpInfo: typeof(ContextHelpInfo);
 
   render() {
     const info = this.props.info;
@@ -45,18 +45,31 @@ export default class ContextHelp extends React.Component<void, ContextHelpProps,
         if (info.moreName) {
           more = (
             <p>
-              To learn more about {info.moreName}, visit
+              To learn more about
+              {' '}
+              {info.moreName}
+              , visit
               <a
                 ref={info.moreLink}
                 target="_blank"
                 rel="noopener noreferrer"
               >
                 Attivio Answers
-              </a>.
+              </a>
+              .
             </p>
           );
         } else {
-          more = <p>To learn more, visit <a href={info.moreLink} target="_blank" rel="noopener noreferrer">Attivio Answers</a>.</p>;
+          more = (
+            <p>
+              To learn more, visit
+              {' '}
+              <a href={info.moreLink} target="_blank" rel="noopener noreferrer">
+                Attivio Answers
+              </a>
+              .
+            </p>
+          );
         }
       }
 

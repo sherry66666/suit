@@ -10,11 +10,7 @@ import FormGroup from 'react-bootstrap/lib/FormGroup';
 
 type LoginFormProps = {
   doLogin: (name: string, password: string) => void;
-  error: string | null;
-};
-
-type LoginFormDefaultProps = {
-  error: string | null;
+  error?: string;
 };
 
 type LoginFormState = {
@@ -23,9 +19,9 @@ type LoginFormState = {
   password: string;
 };
 
-export default class LoginForm extends React.Component<LoginFormDefaultProps, LoginFormProps, LoginFormState> {
+export default class LoginForm extends React.Component<LoginFormProps, LoginFormState> {
   static defaultProps = {
-    error: null,
+    error: undefined,
   };
 
   static displayName = 'LoginForm';
@@ -49,13 +45,13 @@ export default class LoginForm extends React.Component<LoginFormDefaultProps, Lo
     event.preventDefault();
   }
 
-  updateUsername(event: Event & { currentTarget: HTMLInputElement }) {
+  updateUsername(event: SyntheticEvent<HTMLInputElement>) {
     this.setState({
       username: event.currentTarget.value,
     });
   }
 
-  updatePassword(event: Event & { currentTarget: HTMLInputElement }) {
+  updatePassword(event: SyntheticEvent<HTMLInputElement>) {
     this.setState({
       password: event.currentTarget.value,
     });

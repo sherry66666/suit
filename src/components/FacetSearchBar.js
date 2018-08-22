@@ -1,6 +1,5 @@
 // @flow
-import React from 'react';
-import type { Children } from 'react';
+import * as React from 'react';
 import PropTypes from 'prop-types';
 
 import MenuItem from 'react-bootstrap/lib/MenuItem';
@@ -9,39 +8,30 @@ import QueryResponse from '../api/QueryResponse';
 import SimpleQueryRequest from '../api/SimpleQueryRequest';
 import ObjectUtils from '../util/ObjectUtils';
 import SearchFacetBucket from '../api/SearchFacetBucket';
+import Searcher from './Searcher';
 
 type FacetSearchBarProps = {
   /** Whether the FacetSearchBar should be shown */
-  showSearchBar: boolean;
+  showSearchBar?: boolean;
   /** A placeholder for the facet search field */
-  placeholder: string;
+  placeholder?: string;
   /** The label to show on the search button. Defaults to "Search." */
-  buttonLabel: string;
+  buttonLabel?: string;
   /** The name of the facet being searched */
-  name: string;
+  name?: string;
   /** Callback to add a filter for this facet */
   addFacetFilter: (bucket: SearchFacetBucket) => void;
   /** Max number of matching facet values to show */
-  maxValues: number;
+  maxValues?: number;
   /** Content to show for the actual facet stuff (typically a ListFacetContents) */
-  children: Children;
+  children: React.Node;
   /**
    * Whether the export button should be shown to allow exporting all the facet
    * values as a CSV file
    */
-  showExportButton: boolean;
+  showExportButton?: boolean;
   /** The label for the export button */
-  exportButtonLabel: string;
-};
-
-type FacetSearchBarDefaultProps = {
-  placeholder: string;
-  buttonLabel: string;
-  name: string;
-  maxValues: number;
-  showSearchBar: boolean;
-  showExportButton: boolean;
-  exportButtonLabel: string;
+  exportButtonLabel?: string;
 };
 
 type FacetSearchBarState = {
@@ -56,12 +46,12 @@ type FacetSearchBarState = {
  * Component that wraps a Facet that allows searching for specific values for that facet,
  * as well as exporting that facet's values to a CSV
  */
-class FacetSearchBar extends React.Component<FacetSearchBarDefaultProps, FacetSearchBarProps, FacetSearchBarState> {
+class FacetSearchBar extends React.Component<FacetSearchBarProps, FacetSearchBarState> {
   static contextTypes = {
-    searcher: PropTypes.any,
+    searcher: PropTypes.instanceOf(Searcher),
   };
 
-  static defaultProps: FacetSearchBarDefaultProps = {
+  static defaultProps = {
     placeholder: 'Search facet values\u2026',
     buttonLabel: 'Search',
     name: '*',
@@ -130,14 +120,20 @@ class FacetSearchBar extends React.Component<FacetSearchBarDefaultProps, FacetSe
       let include = suggestion.displayLabel().length >= this.state.query.length;
       include = include && suggestion.displayLabel().toLowerCase().indexOf(this.state.query.toLowerCase()) !== -1;
       let returnVal = '';
-      if (include && suggestionsAdded < this.props.maxValues) {
+      if (include && this.props.maxValues && suggestionsAdded < this.props.maxValues) {
         suggestionsAdded += 1;
         returnVal = (
           <button
-            className={'facet-suggestion'}
+            className="facet-suggestion"
             key={suggestionsAdded}
             onClick={() => { return this.addFilter(index); }}
-            style={{ width: '100%', textAlign: 'left', borderWidth: '0px', backgroundColor: '#FFFFFF' }}
+            style={{
+              width: '100%',
+              textAlign: 'left',
+              borderWidth: '0px',
+              backgroundColor: '#FFFFFF',
+            }}
+            type="button"
           >
             <MenuItem eventKey={index} key={suggestionsAdded} onSelect={this.addFilter} tabIndex={index}>
               {`${suggestion.displayLabel()} (${suggestion.count})`}
@@ -149,8 +145,14 @@ class FacetSearchBar extends React.Component<FacetSearchBarDefaultProps, FacetSe
     if (contents.length > 0) {
       return (
         <div
-          className={'facet-suggestion'}
-          style={{ width: '100%', border: '1px solid #D2D2D2', borderTop: 'none', passingTop: '11px', position: 'absolute' }}
+          className="facet-suggestion"
+          style={{
+            width: '100%',
+            border: '1px solid #D2D2D2',
+            borderTop: 'none',
+            passingTop: '11px',
+            position: 'absolute',
+          }}
         >
           <ul role="menu" style={{ marginBottom: 0 }}>
             {contents}
@@ -214,13 +216,13 @@ class FacetSearchBar extends React.Component<FacetSearchBarDefaultProps, FacetSe
       const searchTerm = searcher.state.query;
       const simpleQR = new SimpleQueryRequest();
       simpleQR.query = searchTerm;
-      simpleQR.facets = [`${this.props.name}(maxBuckets=${maxBuckets})`];
+      simpleQR.facets = [`${this.props.name ? this.props.name : '*'}(maxBuckets=${maxBuckets})`];
       simpleQR.facetFilters = searcher.state.facetFilters;
       simpleQR.filters = [];
       if (searcher.getQueryRequest().filters && searcher.getQueryRequest().filters.length > 0) {
         Array.prototype.push.apply(simpleQR.filters, searcher.getQueryRequest().filters);
       }
-      simpleQR.filters.push(`${this.props.name}:${queryTerm}`);
+      simpleQR.filters.push(`${this.props.name ? this.props.name : '*'}:${queryTerm}`);
       simpleQR.rows = 0;
       simpleQR.queryLanguage = 'simple';
       simpleQR.workflow = searcher.getQueryRequest().workflow;
@@ -234,7 +236,8 @@ class FacetSearchBar extends React.Component<FacetSearchBarDefaultProps, FacetSe
    */
   doSearch() {
     const callback = this.handleSearchResults;
-    this.doConfiguredSearch(`${this.state.facetValue}*`, this.props.maxValues * 2, callback, this.context.searcher);
+    this.doConfiguredSearch(`${this.state.facetValue}*`,
+      this.props.maxValues ? this.props.maxValues * 2 : 10, callback, this.context.searcher);
   }
 
   /**
@@ -254,7 +257,7 @@ class FacetSearchBar extends React.Component<FacetSearchBarDefaultProps, FacetSe
     const callback = (data: Array<Map<string, Object>>) => {
       const csv = FacetSearchBar.convertArrayOfObjectsToCSV(data);
       if (csv !== null) {
-        const filename = `${this.props.name}_facet_values.csv`;
+        const filename = `${this.props.name ? this.props.name : '*'}_facet_values.csv`;
         // Make the CSV data into a data URI
         const encodedData = encodeURI(`data:text/csv;charset=utf-8,${csv}`);
 
@@ -270,12 +273,9 @@ class FacetSearchBar extends React.Component<FacetSearchBarDefaultProps, FacetSe
   /**
    * Called when a user presses a key.
    */
-  doKeyPress(e: Event) {
-    // If the user presses enter, do the search
-    if (e.target instanceof HTMLInputElement && e.keyCode) {
-      if (e.keyCode === 13) {
-        this.doSearch();
-      }
+  doKeyPress(e: SyntheticKeyboardEvent<HTMLInputElement>) {
+    if (e.keyCode === 13) {
+      this.doSearch();
     }
   }
 

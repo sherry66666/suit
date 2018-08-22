@@ -25,14 +25,10 @@ type CardPickerCardProps = {
    * The number of columns in the card picker. This determines
    * the width of each card. Defaults to 3 columns.
    */
-  columns: number;
+  columns?: number;
 };
 
-type CardPickerCardDefaultProps = {
-  columns: number;
-};
-
-export default class CardPickerCard extends React.Component<CardPickerCardDefaultProps, CardPickerCardProps, void> {
+export default class CardPickerCard extends React.Component<CardPickerCardProps, void> {
   static defaultProps = {
     columns: 3,
   };
@@ -51,12 +47,13 @@ export default class CardPickerCard extends React.Component<CardPickerCardDefaul
     }
   }
 
-  card: ?HTMLAnchorElement;
+  card: HTMLDivElement | null;
 
   render() {
+    const colCount = this.props.columns ? this.props.columns : 3; // Make flow happy
     const style = {
       height: '120px',
-      width: `calc(${100 / this.props.columns}% - 6px)`,
+      width: `calc(${100 / colCount}% - 6px)`,
       margin: '3px',
       padding: '3px',
       color: '#2f75b0',

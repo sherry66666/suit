@@ -39,7 +39,7 @@ export default class SolrToQueryResponse {
   /**
    * Turn non-array field values into arrays.
    */
-  static wrapIfNotArray(v) {
+  static wrapIfNotArray(v: any) {
     return Array.isArray(v) ? v : [v];
   }
 

@@ -5,19 +5,15 @@ type DocumentTypeProps = {
    * The type of the document (generally the value of its table field).
    * If not set, this defaults to "Document".
    */
-  docType: string,
+  docType?: string,
   /** The ordinal position (1-based) of the document within the search results. */
   position: number,
-};
-
-type DocumentTypeDefaultProps = {
-  docType: string,
 };
 
 /**
  * Display the type of the document and its position within the search results.
  */
-export default class DocumentType extends React.Component<DocumentTypeDefaultProps, DocumentTypeProps, void> {
+export default class DocumentType extends React.Component<DocumentTypeProps, void> {
   static defaultProps = {
     docType: 'Document',
   }

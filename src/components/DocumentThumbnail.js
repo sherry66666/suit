@@ -11,7 +11,7 @@ type DocumentThumbnailProps = {
    * The URI of the image to display as the document's
    * thumbnail.
    */
-  uri: string | null;
+  uri?: string;
   /**
    * The URIs of any images to display as previews for the document.
    * If there are none or this isn't set, then no previews will be
@@ -20,15 +20,9 @@ type DocumentThumbnailProps = {
    * URIs, then they will be displayed in a carousel-type control
    * and the user can flip through them.
    */
-  previewUris: Array<string>;
+  previewUris?: Array<string>;
   /** The title to display for the document in the preview, if desired. */
-  previewTitle: string | null;
-};
-
-type DocumentThumbnailDefaultProps = {
-  uri: string | null;
-  previewUris: Array<string>;
-  previewTitle: string | null;
+  previewTitle?: string;
 };
 
 type DocumentThumbnailState = {
@@ -41,11 +35,11 @@ type DocumentThumbnailState = {
  * isn't valid, then the image is hidden rather than showing a
  * broken image in the browser.
  */
-export default class DocumentThumbnail extends React.Component<DocumentThumbnailDefaultProps, DocumentThumbnailProps, DocumentThumbnailState> {
+export default class DocumentThumbnail extends React.Component<DocumentThumbnailProps, DocumentThumbnailState> {
   static defaultProps = {
-    uri: null,
+    uri: undefined,
     previewUris: [],
-    previewTitle: null,
+    previewTitle: undefined,
   };
 
   static displayName = 'DocumentThumbnail';
@@ -77,7 +71,7 @@ export default class DocumentThumbnail extends React.Component<DocumentThumbnail
     const haveImage = this.props.uri && this.props.uri.length > 0;
     const havePreview = this.props.previewUris && this.props.previewUris.length > 0;
 
-    let previews;
+    let previews = [];
     if (this.props.previewUris) {
       if (typeof previews === 'string') {
         previews = [previews];

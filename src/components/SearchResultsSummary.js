@@ -15,7 +15,7 @@ type SearchResultsSummaryProps = {
 /**
  * A summary of the currently displayed search results.
  */
-export default class SearchResultsSummary extends React.Component<void, SearchResultsSummaryProps, void> {
+export default class SearchResultsSummary extends React.Component<SearchResultsSummaryProps, void> {
   static displayName = 'SearchResultsSummary';
 
   render() {
@@ -29,17 +29,40 @@ export default class SearchResultsSummary extends React.Component<void, SearchRe
       const results = totalResults === 1 ? (
         <span>Your search returned 1 document.</span>
       ) : (
-        <span>Your search returned {totalResults} documents.</span>
+        <span>
+          Your search returned
+          {' '}
+          {totalResults}
+          {' '}
+          documents.
+        </span>
       );
       let range;
       if (firstResult !== 1 || lastResult < totalResults) {
         // Not showing the full range so let the user know
-        range = <span>Currently showing documents {firstResult} through {lastResult}.</span>;
+        range = (
+          <span>
+            Currently showing documents
+            {' '}
+            {firstResult}
+            {' '}
+            through
+            {' '}
+            {lastResult}
+            .
+          </span>
+        );
       } else {
         range = <span />;
       }
 
-      return <div>{results} {range}</div>;
+      return (
+        <div>
+          {results}
+          {' '}
+          {range}
+        </div>
+      );
     }
     return <div />;
   }

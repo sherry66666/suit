@@ -55,9 +55,9 @@ type MenuProps = {
    * The <em>value</em> of the currently selected item or items.
    * If set, then there must be a menu item whose value matches
    * this/these. If multiSelect is set, then this must be an
-   * array.
+   * array otherwise it must be a simple string.
    */
-  selection: Array<string> | string | null;
+  selection?: Array<string> | string;
   /** The list of items to display in the menu. */
   items: Array<MenuItemDef>;
   /**
@@ -66,77 +66,63 @@ type MenuProps = {
    */
   onSelect: (item: MenuItemDef) => void;
   /** If set, the menu is aligned to the right. */
-  right: boolean;
+  right?: boolean;
   /**
    * If set, the menu can have multiple values selected at the
    * same time.
    */
-  multiSelect: boolean;
+  multiSelect?: boolean;
   /**
    * If set, then the multi-select menu will have a links to
    * select all or none at the top. Only applies if multiSelect
    * is also set.
    */
-  selectAllNone: null | (selectAll: boolean) => void;
+  selectAllNone?: (selectAll: boolean) => void;
   /**
    * If set, the menu will be shown in a "block" style, taking up
    * the width of its parent. In addition, when a block-style
    * menu has a selection, it is shown with a yellow dot to the left
    * of the label.
    */
-  block: boolean;
+  block?: boolean;
   /**
    * If there is no selection and this property is set, it is shown
    * instead of the standard "label" property.
    */
-  promptLabel: string | null;
+  promptLabel?: string;
   /**
-   * For a multiSelect menmu, this is the label to show when all
+   * For a multiSelect menu, this is the label to show when all
    * of the items have been selected. Defaults to "All" but you
    * can override this if your "All" has a different meaning, such
    * as "Show the average instead of an aggregate value."
    */
-  allLabel: string | null;
+  allLabel?: string;
   /**
    * If you want the menu to be fixed to a set width, set this value
    * to the number of pixels you want the css style to map the menu's
    * width to. Must be greater than 40 if set.
    */
-  width: number | null;
+  width?: number;
   /** Any CSS style you need to apply to the menu. Optional. */
-  style: any;
+  style?: any;
 };
 
-type MenuDefaultProps = {
-  selection: Array<string> | string | null;
-  right: boolean;
-  multiSelect: boolean;
-  selectAllNone: null | (selectAll: boolean) => void;
-  block: boolean;
-  promptLabel: string | null;
-  allLabel: string | null;
-  maxLabelCharacters: number | null;
-  width: number | null;
-  style: any;
-};
-
-export default class Menu extends React.Component<MenuDefaultProps, MenuProps, void> {
+export default class Menu extends React.Component<MenuProps, void> {
   static defaultProps = {
-    selection: null,
+    selection: undefined,
     right: false,
     multiSelect: false,
-    selectAllNone: null,
+    selectAllNone: undefined,
     block: false,
-    promptLabel: null,
+    promptLabel: undefined,
     allLabel: 'All',
-    maxLabelCharacters: null,
-    width: null,
+    width: undefined,
     style: {},
   };
 
   static displayName = 'Menu';
 
-  static MenuItemDef;
+  static MenuItemDef: typeof(MenuItemDef);
 
   constructor(props: MenuProps) {
     super(props);
@@ -181,7 +167,13 @@ export default class Menu extends React.Component<MenuDefaultProps, MenuProps, v
     }
     if (valueItem) {
       if (valueItem.customIconClass) {
-        return <span>{valueItem.label} <span className={valueItem.customIconClass} /></span>;
+        return (
+          <span>
+            {valueItem.label}
+            {' '}
+            <span className={valueItem.customIconClass} />
+          </span>
+        );
       }
       return valueItem.label;
     }
@@ -268,8 +260,8 @@ export default class Menu extends React.Component<MenuDefaultProps, MenuProps, v
     }
     const selectionLabel = this.calcSelectionLabel();
 
-    const buttonLabelPrefix = this.props.block && this.props.selection ?
-      (
+    const buttonLabelPrefix = this.props.block && this.props.selection
+      ? (
         <span>
           <span
             className="attivio-model-dot"
@@ -298,7 +290,13 @@ export default class Menu extends React.Component<MenuDefaultProps, MenuProps, v
       const selected = this.isSelected(item);
       let itemLabel = item.label;
       if (item.customIconClass) {
-        itemLabel = <span>{item.label} <span className={item.customIconClass} /></span>;
+        itemLabel = (
+          <span>
+            {item.label}
+            {' '}
+            <span className={item.customIconClass} />
+          </span>
+        );
       }
       if (this.props.multiSelect) {
         return (
@@ -339,7 +337,16 @@ export default class Menu extends React.Component<MenuDefaultProps, MenuProps, v
       >
         <ul className="attivio-dropdown-toolbar attivio-list-inline list-inline">
           <li>
-            Check: <a onClick={this.selectAll} role="button" tabIndex={0} ref={(c) => { this.selectAllLink = c; }}>All</a>
+            Check:
+            {' '}
+            <a
+              onClick={this.selectAll}
+              role="button"
+              tabIndex={0}
+              ref={(c) => { this.selectAllLink = c; }}
+            >
+              All
+            </a>
           </li>
           <li>
             <a onClick={this.selectNone} role="button" tabIndex={0} ref={(c) => { this.selectNoneLink = c; }}>None</a>

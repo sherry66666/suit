@@ -2,13 +2,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import Searcher from './Searcher';
+
 type SearchResultsPagerProps = {
   /** If set, then the pager control will be "pulled right" in its parent. */
-  right: boolean;
-};
-
-type SearchResultsPagerDefaultProps = {
-  right: boolean;
+  right?: boolean;
 };
 
 /**
@@ -18,13 +16,13 @@ type SearchResultsPagerDefaultProps = {
  * on and whether we can go forward or backward and also to
  * trigger a jump to the next or previous page.
  */
-export default class SearchResultsPager extends React.Component<SearchResultsPagerDefaultProps, SearchResultsPagerProps, void> {
+export default class SearchResultsPager extends React.Component<SearchResultsPagerProps, void> {
   static defaultProps = {
     right: false,
   };
 
   static contextTypes = {
-    searcher: PropTypes.any,
+    searcher: PropTypes.instanceOf(Searcher),
   };
 
   static displayName = 'SearchResultsPager';
@@ -136,7 +134,11 @@ export default class SearchResultsPager extends React.Component<SearchResultsPag
             <div className={leftRight}>
               <div className="attivio-globalmastnavbar-pagination">
                 {leftButton}
-                <div className="attivio-globalmastnavbar-pagination-page">Page {currentDisplayPage}</div>
+                <div className="attivio-globalmastnavbar-pagination-page">
+                  Page
+                  {' '}
+                  {currentDisplayPage}
+                </div>
                 {rightButton}
               </div>
             </div>

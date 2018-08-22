@@ -55,23 +55,17 @@ type NetworkDiagramProps = {
   /** The edges connecting the nodes. */
   edges: Array<Edge>;
   /** Any options for the diagram. See the vis.js documentation for details. Optional. */
-  options: any;
+  options?: any;
   /** Any CSS you want to apply to the containing div element. Optional. */
-  style: any;
-  /** A callback when something in the diagram is double-clicked */
-  onDoubleClick: (event: NetworkEventInfo) => void;
-};
-
-type NetworkDiagramDefaultProps = {
-  options: any;
-  style: any;
-  onDoubleClick: (event: NetworkEventInfo) => void;
+  style?: any;
+  /** An optional callback when something in the diagram is double-clicked. */
+  onDoubleClick?: (event: NetworkEventInfo) => void;
 };
 
 /**
  * Component to display an arbitrary network diagram of nodes and edges.
  */
-export default class NetworkDiagram extends React.Component<NetworkDiagramDefaultProps, NetworkDiagramProps, void> {
+export default class NetworkDiagram extends React.Component<NetworkDiagramProps, void> {
   static defaultProps = {
     options: {},
     style: {},
@@ -80,8 +74,8 @@ export default class NetworkDiagram extends React.Component<NetworkDiagramDefaul
 
   static displayName = 'NetworkDiagram';
 
-  static Node;
-  static Edge;
+  static Node: typeof(Node);
+  static Edge: typeof(Edge);
 
   componentDidMount() {
     const data = {
@@ -91,7 +85,9 @@ export default class NetworkDiagram extends React.Component<NetworkDiagramDefaul
 
     this.network = new vis.Network(this.networkDiagram, data, this.props.options);
     this.network.on('doubleClick', (event: NetworkEventInfo) => {
-      this.props.onDoubleClick(event);
+      if (this.props.onDoubleClick) {
+        this.props.onDoubleClick(event);
+      }
     });
     this.network.on('stabilizationIterationsDone', () => {
       this.network.stopSimulation();
@@ -125,7 +121,7 @@ export default class NetworkDiagram extends React.Component<NetworkDiagramDefaul
     }
   }
 
-  networkDiagram: React.Component<*>;
+  networkDiagram: HTMLDivElement | null;
   network: vis.Network;
 
   render() {

@@ -1,9 +1,15 @@
 // @flow
 import SolrToQueryResponse from './SolrToQueryResponse';
+import FacetFilter from '../api/FacetFilter';
 
 export default class QueryRequestToSolr {
   static convert(qr: any, baseUri: string, customOptions: any, callback: any) {
-    const { query, rows = 0, sort = ['.score:DESC'], facetFilters } = qr;
+    const {
+      query,
+      rows = 0,
+      sort = ['.score:DESC'],
+      facetFilters,
+    } = qr;
     const { offset = ['0'] } = qr.restParams;
 
     const body = JSON.stringify({
@@ -35,7 +41,7 @@ export default class QueryRequestToSolr {
       .catch((e) => { return callback(`Error: ${e}`); });
   }
 
-  static buildFilter(facetFilters): string {
+  static buildFilter(facetFilters: Array<FacetFilter>): string {
     if (!facetFilters || facetFilters.length === 0) return '';
     return `${facetFilters.map((ff) => { return ff.filter; }).join(' AND ')}`;
   }
@@ -48,7 +54,7 @@ export default class QueryRequestToSolr {
     return aggs;
   }
 
-  static buildSort(sort, customConfig): string {
+  static buildSort(sort: Array<string>, customConfig: any): string {
     if (!sort || !sort[0] || sort[0].length === 0) return 'score DESC';
     const [field, order] = sort[0].split(':');
     const fieldInSolr = customConfig.mappings[field];

@@ -23,18 +23,14 @@ type BreadcrumbsProps = {
    * The callback to use when a breadcrumb link is clicked. Defaults to
    * just pushing the breadcrumb's location onto the router.
    */
-  onClick: null | (location: any) => void;
+  onClick?: (location: any) => void;
 };
 
-type BreadcrumbsDefaultProps = {
-  onClick: null | (location: any) => void;
-};
-
-class Breadcrumbs extends React.Component<BreadcrumbsDefaultProps, BreadcrumbsProps, void> {
+class Breadcrumbs extends React.Component<BreadcrumbsProps, void> {
   static BreadcrumbInfo;
 
   static defaultProps = {
-    onClick: null,
+    onClick: undefined,
   };
 
   static displayName = 'Breadcrumbs';
@@ -44,7 +40,7 @@ class Breadcrumbs extends React.Component<BreadcrumbsDefaultProps, BreadcrumbsPr
     (this: any).handleClick = this.handleClick.bind(this);
   }
 
-  links: ?Array<HTMLAnchorElement>;
+  links: Array<HTMLAnchorElement | null>;
 
   handleClick(location: any, index: number) {
     if (this.links && this.links[index]) {

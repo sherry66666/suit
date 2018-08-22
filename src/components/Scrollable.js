@@ -1,7 +1,6 @@
 // @flow
 
-import React from 'react';
-import type { Children } from 'react';
+import * as React from 'react';
 
 type ScrollableProps = {
   /**
@@ -10,56 +9,47 @@ type ScrollableProps = {
    * scrolling, the height must be set, for horizontal scrolling, the width
    * must be.
    */
-  style: any;
+  style?: any;
   /**
    * The height to use for the outer div. If set, this overrides the height value
    * in the style property.
    */
-  height: string | null;
+  height?: string;
   /**
    * The width to use for the outer div. If set, this overrides the width value
    * in the style property.
    */
-  width: string | null;
+  width?: string;
   /**
    * Whether the Scrollable should work in the vertical direction.
    * Defaults to true.
    */
-  vertical: boolean;
+  vertical?: boolean;
   /**
    * Whether the Scrollable should work in the horizontal direction.
    * Defaults to false.
    */
-  horizontal: boolean;
+  horizontal?: boolean;
   /**
    * If set, the scrollbars will always appear. If not, they will
    * only be there if the contents are large enough to warrant scrolling.
    */
-  force: boolean;
+  force?: boolean;
   /**
    * The contents that will be scrolled.
    */
-  children: Children;
-};
-
-type ScrollableDefaultProps = {
-  style: any;
-  vertical: boolean;
-  horizontal: boolean;
-  force: boolean;
-  height: string | null;
-  width: string | null;
+  children: React.Node;
 };
 
 /**
  * A scrollable contianer for other components. If the size of the children is large enough that
  * they won't fit, scroll bars are enabled to let the user scroll to see the rest of the contents.
  */
-export default class Scrollable extends React.Component<ScrollableDefaultProps, ScrollableProps, void> {
+export default class Scrollable extends React.Component<ScrollableProps, void> {
   static defaultProps = {
     style: {},
-    height: null,
-    width: null,
+    height: undefined,
+    width: undefined,
     vertical: true,
     horizontal: false,
     force: false,

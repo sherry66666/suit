@@ -1,6 +1,5 @@
 // @flow
-import React from 'react';
-import type { Children } from 'react';
+import * as React from 'react';
 
 import PropTypes from 'prop-types';
 import { withRouter } from 'react-router-dom';
@@ -8,44 +7,34 @@ import { withRouter } from 'react-router-dom';
 import Configurable from './Configurable';
 import MastheadUser from './MastheadUser';
 import AuthUtils from '../util/AuthUtils';
+import Searcher from './Searcher';
 
 type MastheadProps = {
   location: PropTypes.object.isRequired;
   history: PropTypes.object.isRequired;
   /** The logo to display. Defaults to an Attivio logo. */
-  logoUri: string | null;
+  logoUri?: string;
   /** Alt text for the logo. Defaults to "Attivio Home". */
-  logoAlt: string | null;
+  logoAlt?: string;
   /** The route to navigate to when the user clicks the logo. Defaults to '/' */
-  homeRoute: string | null;
-  /** The name of the application. */
-  applicationName: string | null;
+  homeRoute?: string;
+  /** The name of the application. Optional. */
+  applicationName?: string;
   /** If set, then the application name will wrap to two lines. */
-  multiline: boolean;
+  multiline?: boolean;
   /**
    * The engine being used. Defaults to 'attivio.'
    */
-  searchEngineType: 'attivio' | 'solr' | 'elastic';
+  searchEngineType?: 'attivio' | 'solr' | 'elastic';
   /** The URI to use for global on-line help. If not set, the help button won't be shown. */
-  helpUri: string | null;
+  helpUri?: string;
   /**
    * The username to use if not using AuthUtils to get it. Setting this
    * disables logging out as a side-effect.
    */
-  username: string | null;
+  username?: string;
   /** The contents of the Masthead can be arbitrary components. */
-  children: Children;
-};
-
-type MastheadDefaultProps = {
-  logoUri: string | null;
-  logoAlt: string | null;
-  homeRoute: string | null;
-  applicationName: string | null;
-  multiline: boolean;
-  searchEngineType: 'attivio' | 'solr' | 'elastic';
-  helpUri: string | null;
-  username: string | null;
+  children: React.Node;
 };
 
 type MastheadState = {
@@ -59,8 +48,8 @@ type MastheadState = {
  * being in masthead have names that start with "Masthead," such as
  * MastheadNavBar and MastheadNavTabs.
  */
-class Masthead extends React.Component<MastheadDefaultProps, MastheadProps, MastheadState> {
-  static defaultProps: MastheadDefaultProps = {
+class Masthead extends React.Component<MastheadProps, MastheadState> {
+  static defaultProps = {
     logoUri: 'img/attivio-logo-reverse.png',
     logoAlt: 'Attivio Home',
     homeRoute: '/',
@@ -73,7 +62,7 @@ class Masthead extends React.Component<MastheadDefaultProps, MastheadProps, Mast
   }
 
   static contextTypes = {
-    searcher: PropTypes.any,
+    searcher: PropTypes.instanceOf(Searcher),
   };
 
   static displayName = 'Masthead';
@@ -142,7 +131,7 @@ class Masthead extends React.Component<MastheadDefaultProps, MastheadProps, Mast
     this.props.history.push({ pathname: this.props.homeRoute, search: this.props.location.search });
   }
 
-  homeLink: ?HTMLAnchorElement;
+  homeLink: ?HTMLButtonElement;
 
   render() {
     let engineInfo = null;
@@ -193,6 +182,7 @@ class Masthead extends React.Component<MastheadDefaultProps, MastheadProps, Mast
             ref={(c) => {
               this.homeLink = c;
             }}
+            type="button"
           >
             <img src={this.props.logoUri} alt={this.props.logoAlt} className="attivio-globalmast-logo-img" />
             {engineInfo}

@@ -1,6 +1,5 @@
 // @flow
-import React from 'react';
-import type { Children } from 'react';
+import * as React from 'react';
 
 import { withRouter } from 'react-router-dom';
 import PropTypes from 'prop-types';
@@ -11,34 +10,9 @@ import SimpleQueryRequest from '../api/SimpleQueryRequest';
 import QueryResponse from '../api/QueryResponse';
 import FacetFilter from '../api/FacetFilter';
 import FieldNames from '../api/FieldNames';
-
 import ObjectUtils from '../util/ObjectUtils';
-
-import Configurable from '../components/Configurable';
-import Configuration from '../components/Configuration';
-
-/*
-  A NOTE ABOUT THE SEARCHER, THE PAGE'S URL, AND WHEN QUERYING HAPPENS:
-
-  When the Searcher is first loaded, we check for query parameters and apply them if they exist.
-  In this case, we need to do a search right away.
-
-  When the Searcher is updated with a new query string, we parse it and possibly do a new search,
-  if it has changed.
-
-  When the user does a search manually, we need to calculate the query string and push the new
-  location onto the router's history if it has changed. (This happens in the method doSearch().)
-
-  When the user updates a property that affects existing searches but doesn't require resetting,
-  we update the state and then, if there has been a previous search, perform a new one (and, only
-  in this case, update the search string).
-
-  When the user updates a property that affects existing searches and does require resetting,
-  then we update the state including setting the offset to 0, and, if there has been a previous
-  search, we perform a new one (and, only in this case, update the search string). The following
-  properties require resetting when they're changed: geoFilters (adding or removing), resultsPerPage,
-  facetFilters (adding or removing), sort, relevancyModels, format, and searchProfile.
-*/
+import Configurable from './Configurable';
+import Configuration from './Configuration';
 
 type SearcherProps = {
   location: PropTypes.object.isRequired;
@@ -46,30 +20,30 @@ type SearcherProps = {
 
   /**
    * The engine backing the SUIT application. Defaults to 'attivio'.
-   * Set to 'solr' or 'elastic' to use one of those engines instesd.
+   * Set to 'solr' or 'elastic' to use one of those engines instead.
    */
-  searchEngineType: 'attivio' | 'solr' | 'elastic';
+  searchEngineType?: 'attivio' | 'solr' | 'elastic';
   /**
    * If a search engine than 'attivio' is specified, this property contains
    * configuration mappings and other options for it. It is ignored when the
    * engine is 'attivio'.
    */
-  customOptions: any;
+  customOptions?: any;
   /**
    * Optional. The location of the node through which to interact with Attivio.
    * Defaults to the value in the configuration.
    */
-  baseUri: string;
+  baseUri?: string;
   /** The workflow to use when performing the search. Defaults to the "search" workflow. */
-  searchWorkflow: string;
+  searchWorkflow?: string;
   /** The list of document fields to return when performing the search. Defaults to all fields (*). */
-  fields: Array<string>;
+  fields?: Array<string>;
   /** The list of facets to request when performing the search. Defaults to just 'table'. */
-  facets: Array<string>;
+  facets?: Array<string>;
   /** The list of relevancy models to use when performing the search. Defaults to the 'default' model. */
-  relevancyModels: Array<string>;
+  relevancyModels?: Array<string>;
   /** The maxumum number of facets for FacetFinder to add. Defaults to 0, which means FF is disabled. */
-  facetFinderCount: number;
+  facetFinderCount?: number;
   /** An optional filter to apply to all queries. */
   queryFilter?: string | null;
   /**
@@ -78,106 +52,75 @@ type SearcherProps = {
    * highlighting on the request, only highlighting field expressions specified, and
    * 'all' adds a teaser field expression to all your display fields when not in debug mode.
    */
-  highlightResults: 'on' | 'off' | 'all';
+  highlightResults?: 'on' | 'off' | 'all';
   /** The join rollup mode to use. Defaults to 'TREE'. */
-  joinRollupMode: 'TREE' | 'AGGREGATE' | 'SQL';
+  joinRollupMode?: 'TREE' | 'AGGREGATE' | 'SQL';
   /** An optional locale to use for the search. */
-  locale?: string | null;
+  locale?: string;
   /** The default language to use for querying. Defaults to 'simple' if not specified. */
-  defaultQueryLanguage: 'simple' | 'advanced';
+  defaultQueryLanguage?: 'simple' | 'advanced';
 
   /** A field expression to override what is used for the title, defaults to 'title' */
-  title: string;
+  title?: string;
   /** A field expression to override what is used for the URI, defaults to 'uri' */
-  uri: string;
+  uri?: string;
   /** A field expression to override what is used for the table, defaults to 'table' */
-  table: string;
+  table?: string;
   /**
    * A field expression to override what is used for the teaser, defaults to
    * 'SCOPETEASER(text, fragment=true, numFragments=4, fragmentScope=sentence)'
    */
-  teaser: string;
+  teaser?: string;
   /**
    * A field expression to override what is used for the text, defaults to
    * 'SCOPETEASER(text, fragment=true, numFragments=1, fragmentSize=2147483647)'
    */
-  text: string;
+  text?: string;
   /**
    * A field expression to override what is used for the URI to the preview image,
    * defaults to 'img.uri.preview'
    */
-  previewImageUri: string;
+  previewImageUri?: string;
   /** A field expression to override what is used for the UTI to the document’s
    * thumbnail, defaults to 'img.uri.thumbnail' */
-  thumbnailImageUri: string;
+  thumbnailImageUri?: string;
   /** A field expression to override what is used for the latitude, defaults to 'latitude' */
-  latitude: string;
+  latitude?: string;
   /** A field expression to override what is used for the longitude, defaults to 'longitude' */
-  longitude: string;
+  longitude?: string;
   /**
    * A field expression to override what is used for the query to use when asking
    * for similar documents, defaults to 'morelikethisquery' */
-  moreLikeThisQuery: string;
+  moreLikeThisQuery?: string;
   /** A field expression to override what is used for the MIME type, defaults to 'mimetype' */
-  mimetype: string;
+  mimetype?: string;
   /**
    * A field expression to override what is used for the path to the ingested document,
    * defaults to 'sourcepath'
    */
-  sourcePath: string;
+  sourcePath?: string;
   /** If true, include fields added by the query workflow, defaults to true */
   // showWorkflowFields: boolean;
   /** The workflow to use when updating document properties, defaults to 'ingest' */
   // ingestWorkflow: string;
   /** The format to use for displaying the individual documents. */
-  format: 'list' | 'usercard' | 'doccard' | 'debug' | 'simple';
+  format?: 'list' | 'usercard' | 'doccard' | 'debug' | 'simple';
   /** The number of document results to display on each page of the results set */
-  resultsPerPage: number;
+  resultsPerPage?: number;
   /**
    * The name of the Business Center profile to use for queries. If set, this will enable Profile level campaigns and promotions.
    */
-  businessCenterProfile?: string | null;
+  businessCenterProfile?: string;
   /**
    * The Searcher contains arbitrary children, including the components that
    * control its properties and display the search results.
    */
-  children: Children;
-};
-
-type SearcherDefaultProps = {
-  searchEngineType: 'attivio' | 'elastic' | 'solr';
-  customOptions: any;
-  baseUri: string;
-  searchWorkflow: string;
-  fields: Array<string>;
-  facets: Array<string>;
-  relevancyModels: Array<string>;
-  facetFinderCount: number;
-  queryFilter: string | null;
-  highlightResults: 'on' | 'off' | 'all';
-  joinRollupMode: 'TREE' | 'AGGREGATE' | 'SQL';
-  locale: string | null;
-  title: string;
-  uri: string;
-  table: string;
-  teaser: string;
-  text: string;
-  previewImageUri: string;
-  thumbnailImageUri: string;
-  latitude: string;
-  longitude: string;
-  moreLikeThisQuery: string;
-  mimetype: string;
-  sourcePath: string;
-  format: 'list' | 'usercard' | 'doccard' | 'debug' | 'simple';
-  resultsPerPage: number;
-  businessCenterProfile: string | null;
-  defaultQueryLanguage: 'simple' | 'advanced';
+  children: React.Node;
 };
 
 /*
  * NOTE: If you add or remove anything from the Searcher's state, you'll
- * need to update (at least) the following methods to accommodate the chnage:
+ * need to update (at least) the following methods to accommodate the change:
  *   constructor()
  *   getQueryRequest()
  *   generateLocationQueryStringFromState()
@@ -202,61 +145,65 @@ type SearcherState = {
 };
 
 /**
- * A wrapper for an Attivio search. Child components can access this object using
- * the searcher property that is inserted into their context object. This allows them
- * to access the Searcher's state to see all of its input parameters aa well as the
- * results of the most recent search and any errors. In addition, they can use the
- * reference to the Seacher to call methods which allow them to update the Searcher's
- * state or execute searches.
+ * A wrapper for an Attivio search. Components contained inside a Searcher component
+ * can access this object using the searcher property that is inserted into their
+ * context object. This allows them to access the Searcher's state to see all of its
+ * input parameters aa well as the results of the most recent search and any error.
+ * In addition, they can use the reference to the Searcher to call methods which allow
+ * them to update the Searcher's state and execute searches.
+ *
+ * To access the searcher, they should define their contextTypes like this:
+ * <code>
+ *   static contextTypes = {
+ *    searcher: PropTypes.instanceOf(Searcher),
+ *   };
+ * </code>
  *
  * The Searcher also provides a method, doCustomSearch(), that lets the callers
  * query the index using the configured Search class but providing their own request
  * object, without affecting the Searcher's state.
  *
- * See the SearchResults component for an example
- * of how this is done using by defining "static contextTypes" in the component.
- *
  * Note that the Searcher will add query parameters to the URL for the page's location
- * when the usere executes a (non-custom) search. This allows the URL for the search to be
+ * when the user executes a (non-custom) search. This allows the URL for the search to be
  * used to repeat the same search, either when refreshing the browser window or when
  * bookmarking the page, sharing it in an email, etc. The URL is updated whenever a search
  * happens, whether caused by the user clicking the search button or by changing the
  * parameters to an existing search (e.g., changing the sort order or paging through the
  * results).
-
- IF
-Searcher is first loaded, we need to check for query parameters and apply them if they exist.In this case, we need to do the search.
-
-IF
-Searcher is updated with a new query string, then we need to parse it and possibly do a new search, if it has changed.
-
-IF
-User does a search manually, we need to calculate the query string and push the new location onto the history if it has changed.
-  THIS HAPPENS IN THE doSearch() method
-
-IF
-User updates a property that affects existing searches but doesn't require resetting, we need to update the state and then,
-if there's a previous search, perform a new one (and, only in this case, update the search string
-  THIS HAPPENDS WHEN THESE PROPERTIES CHANGE:
-      resultsOffset (i.e., paging)
-
-IF
-User updates a property that affects existing searches AND requires resetting, then we need to update the state including setting
-the offset to 0, and , if there's a previous search, perform a new one (and, only in this case, update the search string
-  THIS HAPPENDS WHEN THESE PROPERTIES CHANGE:
-      geoFilters (adding or removing)
-      resultsPerPage
-      facetFilters (adding or removing)
-      sort
-      relevancyModels
-      format
-      searchProfile
-
-
-      // NEED TO DEAL WITH VALUES IN URL THAT ARE NOT VALID...
-
+ *
+ * Here is how the Searcher's state is updated in response to different events:
+ * When the Searcher is first loaded, we check for query parameters and apply them if
+ * they exist. In this case, we need to also perform a search immediately. This happens
+ * when, say, a user goes directly to a URL which has search parameters in its query string.
+ *
+ * When the Searcher is updated with a new query string, then we need to parse it and
+ * possibly do a new search, if the relevant state has changed.
+ *
+ * When the user does a search manually, we need to calculate the query string and push the
+ * new location onto the history if it has changed. This happens in the <code>doSearch()</code> method.
+ *
+ * When the user updates a property that affects existing searches but doesn't require resetting,
+ * we need to update the state and then, if there was a previous search, perform a new one (and,
+ * only in this case, update the search string). This happens when the following properties change:
+ * <ul>
+ *   <li>resultsOffset</li>
+ * </ul>
+ *
+ * When the user updates a property that affects existing searches <em>and</em> requires resetting,
+ * then we need to update the state including setting the offset to 0. If there was a previous
+ * search, we perform a new one (and, only in this case, update the search string). This happens
+ * when the following properties change:
+ * <ul>
+ *   <li>geoFilters (adding or removing)</li>
+ *   <li>resultsPerPage</li>
+ *   <li>facetFilters (adding or removing)</li>
+ *   <li>sort</li>
+ *   <li>relevancyModels</li>
+ *   <li>format</li>
+ *   <li>searchProfile</li>
+ * </ul>
  */
-class Searcher extends React.Component<SearcherDefaultProps, SearcherProps, SearcherState> {
+class Searcher extends React.Component<SearcherProps, SearcherState> {
   static defaultProps = {
     searchEngineType: 'attivio',
     customOptions: {},
@@ -266,10 +213,10 @@ class Searcher extends React.Component<SearcherDefaultProps, SearcherProps, Sear
     facets: [],
     relevancyModels: ['default'],
     facetFinderCount: 0,
-    queryFilter: null,
+    queryFilter: undefined,
     highlightResults: 'on',
     joinRollupMode: 'TREE',
-    locale: null,
+    locale: undefined,
     title: FieldNames.TITLE,
     uri: FieldNames.URI,
     table: FieldNames.TABLE,
@@ -284,7 +231,7 @@ class Searcher extends React.Component<SearcherDefaultProps, SearcherProps, Sear
     sourcePath: FieldNames.SOURCEPATH,
     format: 'list',
     resultsPerPage: 10,
-    businessCenterProfile: null,
+    businessCenterProfile: undefined,
     defaultQueryLanguage: 'simple',
   };
 
@@ -293,7 +240,7 @@ class Searcher extends React.Component<SearcherDefaultProps, SearcherProps, Sear
   };
 
   static childContextTypes = {
-    searcher: PropTypes.any,
+    searcher: PropTypes.instanceOf(Searcher),
   }
 
   static displayName = 'Searcher';
@@ -310,7 +257,7 @@ class Searcher extends React.Component<SearcherDefaultProps, SearcherProps, Sear
   }
 
   /**
-   * Conveert an array of stringified facet filters to an array of actual FacetFilter objects.
+   * Convert an array of stringified facet filters to an array of actual FacetFilter objects.
    */
   static deserializeFacetFilters(facetFilters: Array<string>): Array<FacetFilter> {
     return facetFilters.map((facetFilterString: string): FacetFilter => {
@@ -326,7 +273,7 @@ class Searcher extends React.Component<SearcherDefaultProps, SearcherProps, Sear
   constructor(props: SearcherProps) {
     super(props);
 
-    this.search = new Search(this.props.baseUri, this.props.searchEngineType, this.props.customOptions);
+    this.search = new Search(this.props.baseUri || '', this.props.searchEngineType || 'attivio', this.props.customOptions);
 
     this.state = this.getDefaultState();
     (this: any).updateSearchResults = this.updateSearchResults.bind(this);
@@ -376,14 +323,14 @@ class Searcher extends React.Component<SearcherDefaultProps, SearcherProps, Sear
       response: undefined,
       error: undefined,
       query: Searcher.EVERYTHING,
-      queryLanguage: this.props.defaultQueryLanguage,
+      queryLanguage: this.props.defaultQueryLanguage || 'simple',
       sort: ['.score:DESC'],
-      relevancyModels: this.props.relevancyModels,
+      relevancyModels: this.props.relevancyModels || [],
       facetFilters: [],
       geoFilters: [],
       resultsPerPage: parseInt(this.props.resultsPerPage, 10),
       resultsOffset: 0,
-      format: this.props.format,
+      format: this.props.format || 'list',
     };
   }
 
@@ -394,7 +341,7 @@ class Searcher extends React.Component<SearcherDefaultProps, SearcherProps, Sear
    */
   getQueryRequest() {
     const qr = new SimpleQueryRequest();
-    qr.workflow = this.props.searchWorkflow;
+    qr.workflow = this.props.searchWorkflow ? this.props.searchWorkflow : 'search';
     qr.query = this.state.query;
     qr.queryLanguage = this.state.queryLanguage;
     qr.rows = this.state.resultsPerPage;
@@ -409,7 +356,7 @@ class Searcher extends React.Component<SearcherDefaultProps, SearcherProps, Sear
     if (this.props.locale) {
       qr.locale = this.props.locale;
     }
-    qr.facets = this.props.facets;
+    qr.facets = this.props.facets ? this.props.facets : [];
     qr.sort = this.state.sort;
     qr.fields = this.getFieldList();
     qr.facetFilters = this.state.facetFilters;
@@ -417,7 +364,8 @@ class Searcher extends React.Component<SearcherDefaultProps, SearcherProps, Sear
     // And now, the fields that don't have explicit counterparts
     // in the simple query request, which need to be set using
     // the restParams property.
-    const restParams = new Map();
+    const restParams = (new Map(): Map<string, Array<string>>);
+
     restParams.set('offset', [`${this.state.resultsOffset}`]);
     if (this.state.relevancyModels && this.state.relevancyModels.length > 0) {
       restParams.set('relevancymodelnames', [this.state.relevancyModels.join(',')]);
@@ -429,11 +377,12 @@ class Searcher extends React.Component<SearcherDefaultProps, SearcherProps, Sear
       restParams.set('highlight', ['true']);
       restParams.set('highlight.mode', ['HTML']);
     }
-    if (this.props.facetFinderCount > 0) {
+    if (this.props.facetFinderCount && this.props.facetFinderCount > 0) {
+      const ffc = this.props.facetFinderCount.toString(10);
       restParams.set('facet.ff', ['RESULTS']);
-      restParams.set('facet.ffcount', [this.props.facetFinderCount.toString(10)]);
+      restParams.set('facet.ffcount', [ffc]);
     }
-    restParams.set('join.rollup', [this.props.joinRollupMode]);
+    restParams.set('join.rollup', [this.props.joinRollupMode || 'TREE']);
     if (this.props.businessCenterProfile) {
       const profiles = [this.props.businessCenterProfile];
       restParams.set('abc.enabled', ['true']);
@@ -448,24 +397,43 @@ class Searcher extends React.Component<SearcherDefaultProps, SearcherProps, Sear
    * Get the list of fields to use in the query request.
    */
   getFieldList(): Array<string> {
-    // Start out with the fields the user specifed
+    // Start out with the fields the user specified
     const result = [].concat(this.props.fields || []);
+    const teaserField = this.props.teaser || 'SCOPETEASER(text, fragment=true, numFragments=4, fragmentScope=sentence)';
+    const textField = this.props.text || 'SCOPETEASER(text, fragment=true, numFragments=1, fragmentScope=2147483647)';
+
     // Add the mapped fields that the search results will expect
-    result.push(`${this.props.title} as title`);
-    result.push(`${this.props.uri} as uri`);
-    result.push(`${this.props.table} as table`);
-    result.push(`${this.props.teaser} as teaser`);
-    result.push(`${this.props.text} as text`);
-    result.push(`${this.props.previewImageUri} as previewImageUri`);
-    result.push(`${this.props.thumbnailImageUri} as thumbnailImageUri`);
-    result.push(`${this.props.latitude} as latitude`);
-    result.push(`${this.props.longitude} as longitude`);
-    result.push(`${this.props.moreLikeThisQuery} as morelikethisquery`);
-    result.push(`${this.props.mimetype} as mimetype`);
-    result.push(`${this.props.sourcePath} as sourcepath`);
+    result.push(`${this.props.title || FieldNames.TITLE} as title`);
+    result.push(`${this.props.uri || FieldNames.URI} as uri`);
+    result.push(`${this.props.table || FieldNames.TABLE} as table`);
+    result.push(`${teaserField} as teaser`);
+    result.push(`${textField} as text`);
+    result.push(`${this.props.previewImageUri || 'img.uri.preview'} as previewImageUri`);
+    result.push(`${this.props.thumbnailImageUri || 'img.uri.thumbnail'} as thumbnailImageUri`);
+    result.push(`${this.props.latitude || FieldNames.LATITUDE} as latitude`);
+    result.push(`${this.props.longitude || FieldNames.LONGITUDE} as longitude`);
+    result.push(`${this.props.moreLikeThisQuery || 'morelikethisquery'} as morelikethisquery`);
+    result.push(`${this.props.mimetype || FieldNames.MIME_TYPE} as mimetype`);
+    result.push(`${this.props.sourcePath || FieldNames.SOURCEPATH} as sourcepath`);
     // Add the fields we always want
     result.push('tags');
     return result;
+  }
+
+  /**
+   * Set the query string to the passed-in value and trigger the
+   * query immediately, resetting parameters to the beginning.
+   * This is similar to performQueryImmediately() except that the
+   * current value of the queryLanguage is preserved.
+   */
+  setQueryAndSearch(query: string) {
+    this.updateStateResetAndSearch({
+      haveSearched: true, // Force it to update right now
+      error: undefined,
+      response: undefined,
+      facetFilters: [],
+      query,
+    });
   }
 
   /**
@@ -560,7 +528,7 @@ class Searcher extends React.Component<SearcherDefaultProps, SearcherProps, Sear
 
     // Get the query language (and validate that it's one of 'simple' or 'advanced')
     // DEFAULT: this.props.defaultQueryLanguage
-    let queryLanguage: 'simple' | 'advanced' = this.props.defaultQueryLanguage;
+    let queryLanguage: 'simple' | 'advanced' = this.props.defaultQueryLanguage ? this.props.defaultQueryLanguage : 'simple';
     if (parsed.queryLanguage === 'simple' || parsed.queryLanguage === 'advanced') {
       queryLanguage = parsed.queryLanguage;
     }
@@ -581,7 +549,7 @@ class Searcher extends React.Component<SearcherDefaultProps, SearcherProps, Sear
       resultsPerPage = parseInt(parsed.resultsPerPage, 10);
     }
     if (!resultsPerPage || resultsPerPage <= 0) {
-      resultsPerPage = this.props.resultsPerPage;
+      resultsPerPage = this.props.resultsPerPage ? this.props.resultsPerPage : 10;
     }
 
     // Get the offset into the search results (as a positive integer or zero)
@@ -633,15 +601,9 @@ class Searcher extends React.Component<SearcherDefaultProps, SearcherProps, Sear
       relevancyModels = [];
     }
 
-    // LJV TODO
-    // Get the business center profile to use.
-    // DEFAULT: none
-
-    // Get the format.
-    // DEFAULT: this.props.format
-    let format: 'list' | 'usercard' | 'doccard' | 'debug' | 'simple' = this.props.format;
-    if (parsed.format === 'list' || parsed.format === 'usercard' || parsed.format === 'doccard' ||
-        parsed.format === 'debug' || parsed.format === 'simple') {
+    let format: 'list' | 'usercard' | 'doccard' | 'debug' | 'simple' = this.props.format ? this.props.format : 'list';
+    if (parsed.format === 'list' || parsed.format === 'usercard' || parsed.format === 'doccard'
+      || parsed.format === 'debug' || parsed.format === 'simple') {
       format = parsed.format;
     }
 
@@ -737,7 +699,7 @@ class Searcher extends React.Component<SearcherDefaultProps, SearcherProps, Sear
    * Completely reset the searcher to its default state and call an
    * optional callback when done.
    */
-  reset(callback: () => void = () => {}) {
+  reset(callback: () => void = () => { }) {
     this.setState(this.getDefaultState(), callback);
 
     const callBackWrapper = () => {
@@ -790,22 +752,6 @@ class Searcher extends React.Component<SearcherDefaultProps, SearcherProps, Sear
       error: undefined,
       response: undefined,
       queryLanguage: advanced ? 'advanced' : 'simple',
-      facetFilters: [],
-      query,
-    });
-  }
-
-  /**
-   * Set the query string to the passed-in value and trigger the
-   * query immediately, resetting parameters to the beginning.
-   * This is similar to performQueryImmediately() except that the
-   * current value of the queryLanguage is preserved.
-   */
-  setQueryAndSearch(query: string) {
-    this.updateStateResetAndSearch({
-      haveSearched: true, // Force it to update right now
-      error: undefined,
-      response: undefined,
       facetFilters: [],
       query,
     });
@@ -872,7 +818,7 @@ class Searcher extends React.Component<SearcherDefaultProps, SearcherProps, Sear
    * The search is reset to the first page when performed again.
    */
   updateSort(newSort: string) {
-    if (this.newSort !== this.state.sort) {
+    if (newSort !== this.state.sort) {
       let sort = this.state.sort;
       if (sort && sort.length > 0) {
         sort[0] = newSort;

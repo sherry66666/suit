@@ -10,11 +10,12 @@ import Glyphicon from 'react-bootstrap/lib/Glyphicon';
 import PropTypes from 'prop-types';
 import sizeMe from 'react-sizeme';
 
-import Configurable from '../components/Configurable';
+import Configurable from './Configurable';
 import SearchFacetBucket from '../api/SearchFacetBucket';
 import PositionUtils from '../util/PositionUtils';
 import ObjectUtils from '../util/ObjectUtils';
 import StringUtils from '../util/StringUtils';
+import Searcher from './Searcher';
 
 const ReactMapboxGl = require('react-mapbox-gl');
 
@@ -24,14 +25,9 @@ type MapFacetContentsProps = {
   /** Callback to add a filter for this facet. */
   addFacetFilter: (bucket: SearchFacetBucket) => void;
   /** The size for the component. An object with height and width properties. Optional. */
-  size: any;
-  /** The public key with which to connect to the mapbox public apis. */
-  mapboxKey: string;
-};
-
-type MapFacetContentsDefaultProps = {
-  size: any;
-  mapboxKey: string;
+  size?: any;
+  /** The public key with which to connect to the Mapbox public APIs. */
+  mapboxKey?: string;
 };
 
 type MapFacetContentsState = {
@@ -45,14 +41,14 @@ type MapFacetContentsState = {
 /**
  * Component to display the buckets of a facet using a MapBox map.
  */
-class MapFacetContents extends React.Component<MapFacetContentsDefaultProps, MapFacetContentsProps, MapFacetContentsState> {
+class MapFacetContents extends React.Component<MapFacetContentsProps, MapFacetContentsState> {
   static defaultProps = {
     size: null,
     mapboxKey: '',
   };
 
   static contextTypes = {
-    searcher: PropTypes.any,
+    searcher: PropTypes.instanceOf(Searcher),
   };
 
   static displayName = 'MapFacetContents';
@@ -110,8 +106,8 @@ class MapFacetContents extends React.Component<MapFacetContentsDefaultProps, Map
     nextStateTemp.geoFilters = [];
     nextStateTemp.proximityBoosts = [];
     nextStateTemp.updating = '';
-    return !ObjectUtils.deepEquals(this.props.buckets, nextProps.buckets) ||
-           !ObjectUtils.deepEquals(nextStateTemp, stateTemp);
+    return !ObjectUtils.deepEquals(this.props.buckets, nextProps.buckets)
+      || !ObjectUtils.deepEquals(nextStateTemp, stateTemp);
   }
 
   create(e: any) {

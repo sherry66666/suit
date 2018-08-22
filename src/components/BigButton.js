@@ -1,6 +1,5 @@
 // @flow
-import React from 'react';
-import type { Children } from 'react';
+import * as React from 'react';
 
 import PropTypes from 'prop-types';
 import { withRouter } from 'react-router-dom';
@@ -9,25 +8,17 @@ type BigButtonProps = {
   location: PropTypes.object.isRequired;
   history: PropTypes.object.isRequired;
   /** A CSS class name or names to apply to the button */
-  className: string,
+  className?: string,
   /** A Bootstrap button style to apply to the button, such as <code>info</code> or <code>danger</code>. */
-  bsStyle: string,
+  bsStyle?: string,
   /** If set, this button will trigger the router to change the current page to the route specified. */
-  route: string,
+  route?: string,
   /** An optional handler that will be called when the user clicks the button. */
-  onClick: () => void,
+  onClick?: () => void,
   /** The button's contents are any children between the opening and closing tags. */
-  children: Children,
+  children: React.Node,
   /** Any custom CSS styles to apply to the button. */
-  style: any,
-};
-
-type BigButtonDefaultProps = {
-  className: string,
-  bsStyle: string,
-  route: string,
-  onClick: () => void,
-  style: any,
+  style?: any,
 };
 
 /**
@@ -44,7 +35,7 @@ type BigButtonDefaultProps = {
  * pass a value to the <code>bsStyle</code> prop to change its style). Alternatively,
  * you can pass the name of a CSS class or a style object as to style it yourself.
  */
-class BigButton extends React.Component<BigButtonDefaultProps, BigButtonProps, void> {
+class BigButton extends React.Component<BigButtonProps, void> {
   static defaultProps = {
     className: '',
     bsStyle: 'default',

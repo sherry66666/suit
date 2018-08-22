@@ -4,53 +4,40 @@ import PropTypes from 'prop-types';
 
 import Facet from './Facet';
 import SearchFacet from '../api/SearchFacet';
+import Searcher from './Searcher';
 
 type FacetResultsProps = {
   /** The facet field names that should be displayed as pie charts */
-  pieChartFacets: Array<string> | string | null;
+  pieChartFacets?: Array<string> | string;
   /** The facet field names that should be displayed as bar charts */
-  barChartFacets: Array<string> | string | null;
+  barChartFacets?: Array<string> | string;
   /** The facet field names that should be displayed as column charts */
-  columnChartFacets: Array<string> | string | null;
+  columnChartFacets?: Array<string> | string;
   /** The facet field names that should be displayed as lists with bars */
-  barListFacets: Array<string> | string | null;
+  barListFacets?: Array<string> | string;
   /** The facet field names that should be displayed as tag clouds */
-  tagCloudFacets: Array<string> | string | null;
+  tagCloudFacets?: Array<string> | string;
   /** The facet field names that should be displayed as time series */
-  timeSeriesFacets: Array<string> | string | null;
+  timeSeriesFacets?: Array<string> | string;
   /** The facet field names that should be displayed with a sentiment bar */
-  sentimentFacets: Array<string> | string | null;
+  sentimentFacets?: Array<string> | string;
   /** The facet field names that should be displayed with a geographic map */
-  geoMapFacets: Array<string> | string | null;
+  geoMapFacets?: Array<string> | string;
   /**
    * The maximum number of items to show in a facet. If there
    * are more than this many buckets for the facet, only this many, with
    * the highest counts, will be shown. Defaults to 15.
    */
-  maxFacetBuckets: number;
+  maxFacetBuckets?: number;
   /**
    * An optional list of facet field names which will be used to determine
    * the order in which the facets are shown. Any facets not named here will
    * appear after the called-out ones, in the order they are in in the
    * response.facets array of the parent Searcher compoinent.
    */
-  orderHint: Array<string>;
+  orderHint?: Array<string>;
   /** Controls the colors used to show various entity types (the value can be any valid CSS color) */
-  entityColors: Map<string, string>;
-};
-
-type FacetResultsDefaultProps = {
-  pieChartFacets: Array<string> | string | null;
-  barChartFacets: Array<string> | string | null;
-  columnChartFacets: Array<string> | string | null;
-  barListFacets: Array<string> | string | null;
-  tagCloudFacets: Array<string> | string | null;
-  timeSeriesFacets: Array<string> | string | null;
-  sentimentFacets: Array<string> | string | null;
-  geoMapFacets: Array<string> | string | null;
-  maxFacetBuckets: number;
-  orderHint: Array<string>;
-  entityColors: Map<string, string>;
+  entityColors?: Map<string, string>;
 };
 
 /**
@@ -61,7 +48,7 @@ type FacetResultsDefaultProps = {
  * not coveed by one of these property's lists will be displayed
  * in a standard "More…" list.
  */
-export default class FacetResults extends React.Component<FacetResultsDefaultProps, FacetResultsProps, void> {
+export default class FacetResults extends React.Component<FacetResultsProps, void> {
   static defaultProps = {
     pieChartFacets: null,
     barChartFacets: null,
@@ -73,16 +60,16 @@ export default class FacetResults extends React.Component<FacetResultsDefaultPro
     geoMapFacets: null,
     maxFacetBuckets: 15,
     orderHint: [],
-    entityColors: new Map(),
+    entityColors: (new Map(): Map<string, string>),
   };
 
   static contextTypes = {
-    searcher: PropTypes.any,
+    searcher: PropTypes.instanceOf(Searcher),
   };
 
   static displayName = 'FacetResults';
 
-  static matchesFacetList(field: string, facetList: Array<string> | string | null): boolean {
+  static matchesFacetList(field: string, facetList?: Array<string> | string): boolean {
     if (facetList) {
       if (typeof facetList === 'string') {
         return (facetList: string) === field;
@@ -130,33 +117,35 @@ export default class FacetResults extends React.Component<FacetResultsDefaultPro
         facetsMap.set(facet.name, facet);
       });
       const results = [];
-      this.props.orderHint.forEach((facetName) => {
-        const facet = facetsMap.get(facetName);
-        if (facet) {
-          const type = this.getFacetDisplayType(facet.field);
-          results.push(<Facet
-            facet={facet}
-            type={type}
-            key={facet.name}
-            maxBuckets={this.props.maxFacetBuckets}
-            collapse
-            entityColors={this.props.entityColors}
-          />);
-        }
-      });
-      facets.forEach((facet: SearchFacet) => {
-        if (!this.props.orderHint.includes(facet.name)) {
-          const type = this.getFacetDisplayType(facet.field);
-          results.push(<Facet
-            facet={facet}
-            type={type}
-            key={facet.name}
-            maxBuckets={this.props.maxFacetBuckets}
-            collapse
-            entityColors={this.props.entityColors}
-          />);
-        }
-      });
+      if (this.props.orderHint) {
+        this.props.orderHint.forEach((facetName) => {
+          const facet = facetsMap.get(facetName);
+          if (facet) {
+            const type = this.getFacetDisplayType(facet.field);
+            results.push(<Facet
+              facet={facet}
+              type={type}
+              key={facet.name}
+              maxBuckets={this.props.maxFacetBuckets}
+              collapse
+              entityColors={this.props.entityColors}
+            />);
+          }
+        });
+        facets.forEach((facet: SearchFacet) => {
+          if (this.props.orderHint && !this.props.orderHint.includes(facet.name)) {
+            const type = this.getFacetDisplayType(facet.field);
+            results.push(<Facet
+              facet={facet}
+              type={type}
+              key={facet.name}
+              maxBuckets={this.props.maxFacetBuckets}
+              collapse
+              entityColors={this.props.entityColors}
+            />);
+          }
+        });
+      }
       return results;
     }
     return null;

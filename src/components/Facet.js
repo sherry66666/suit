@@ -2,6 +2,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import Searcher from './Searcher';
 import SearchFacet from '../api/SearchFacet';
 import SearchFacetBucket from '../api/SearchFacetBucket';
 import DateUtils from '../util/DateUtils';
@@ -31,46 +32,40 @@ type FacetProps = {
   /** The facet for negative key phrases used in Sentiment TagCloud */
   negativeKeyphrases?: SearchFacet;
   /** The way the facet information should be displayed. Defaults to 'list' */
-  type: FacetType;
+  type?: FacetType;
   /**
    * The maximum number of items to show in a facet. If there
    * are more than this many buckets for the facet, only this many, with
    * the highest counts, will be shown. Defaults to 15.
    */
-  maxBuckets: number;
+  maxBuckets?: number;
   /**
    * If set, then the facet will be displayed in a collapsible component. If
    * the facet is collapsible and has no buckets, it will be collapsed initially.
    */
-  collapse: boolean;
+  collapse?: boolean;
   /** If set, then the facet will be displayed in a card which has a border around it */
-  bordered: boolean;
+  bordered?: boolean;
   /** Controls the colors used to show various entity types (the value can be any valid CSS color) */
-  entityColors: Map<string, string>;
+  entityColors?: Map<string, string>;
 }
-
-type FacetDefaultProps = {
-  type: FacetType;
-  maxBuckets: number;
-  collapse: boolean;
-  bordered: boolean;
-  entityColors: Map<string, string>;
-};
 
 /**
  * Display a single facet from the search results.
  */
-export default class Facet extends React.Component<FacetDefaultProps, FacetProps, void> {
+export default class Facet extends React.Component<FacetProps, void> {
   static defaultProps = {
     type: 'list',
     maxBuckets: 15,
     collapse: false,
     bordered: false,
-    entityColors: new Map(),
+    entityColors: (new Map(): Map<string, string>),
+    positiveKeyphrases: undefined,
+    negativeKeyphrases: undefined,
   };
 
   static contextTypes = {
-    searcher: PropTypes.any,
+    searcher: PropTypes.instanceOf(Searcher),
   };
 
   static displayName = 'Facet';
@@ -125,9 +120,11 @@ export default class Facet extends React.Component<FacetDefaultProps, FacetProps
 
   render() {
     const facetColors = this.props.entityColors;
-    let facetColor;
-    if (this.props.facet) {
-      facetColor = facetColors.has(this.props.facet.field) ? facetColors.get(this.props.facet.field) : null;
+    let facetColor = null;
+    if (this.props.facet && facetColors) {
+      if (facetColors.has(this.props.facet.field)) {
+        facetColor = facetColors.get(this.props.facet.field);
+      }
     }
 
     let facetContents;
@@ -138,7 +135,7 @@ export default class Facet extends React.Component<FacetDefaultProps, FacetProps
             <SentimentTagCloudFacetContents
               positiveBuckets={this.props.positiveKeyphrases.buckets}
               negativeBuckets={this.props.negativeKeyphrases.buckets}
-              maxBuckets={this.props.maxBuckets}
+              maxBuckets={this.props.maxBuckets ? this.props.maxBuckets : 10}
               addFacetFilter={this.addFacetFilter}
             />
           );
@@ -160,7 +157,7 @@ export default class Facet extends React.Component<FacetDefaultProps, FacetProps
               buckets={this.props.facet.buckets}
               addFacetFilter={this.addFacetFilter}
             />
-            );
+          );
           break;
         case 'columnchart':
           facetContents = facetColor ? (
@@ -176,7 +173,7 @@ export default class Facet extends React.Component<FacetDefaultProps, FacetProps
               addFacetFilter={this.addFacetFilter}
               columns
             />
-            );
+          );
           break;
         case 'piechart':
           facetContents = (
@@ -205,7 +202,7 @@ export default class Facet extends React.Component<FacetDefaultProps, FacetProps
           facetContents = (
             <TagCloudFacetContents
               buckets={this.props.facet.buckets}
-              maxBuckets={this.props.maxBuckets}
+              maxBuckets={this.props.maxBuckets ? this.props.maxBuckets : 10}
               addFacetFilter={this.addFacetFilter}
             />
           );
@@ -239,7 +236,7 @@ export default class Facet extends React.Component<FacetDefaultProps, FacetProps
 
     // Prefer the display name but fall back to the name field (note special case for geomaps
     // where we always use the label "Map").
-    let label;
+    let label = '';
     if (this.props.facet) {
       label = this.props.type === 'geomap' ? 'Map' : this.props.facet.findLabel();
     }

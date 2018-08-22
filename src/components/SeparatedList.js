@@ -1,16 +1,15 @@
 // @flow
-import React from 'react';
-import type { Children } from 'react';
+import * as React from 'react';
 
 type SeparatedListProps = {
   /** The contents of the SeparatedList component to be rendered. */
-  children: Children;
+  children: React.Node;
 };
 
 /**
  * Render a list of items with a separator bar in between them.
  */
-export default class SeparatedList extends React.Component<void, SeparatedListProps, void> {
+export default class SeparatedList extends React.Component<SeparatedListProps, void> {
   static displayName = 'SeparatedList';
 
   render() {

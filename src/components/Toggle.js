@@ -1,18 +1,18 @@
 // @flow
 
-import React, { Children } from 'react';
+import * as React from 'react';
 
 type ToggleProps = {
   /** The callback to run when the element is clicked */
   onClick: (e: Event) => void;
   /** The child components */
-  children: Children;
+  children: React.Node;
 };
 
 /**
  * A toggle component for use in DropdownButtons
  */
-export default class Toggle extends React.Component<void, ToggleProps, void> {
+export default class Toggle extends React.Component<ToggleProps, void> {
   static displayName = 'Toggle';
 
   constructor(props: ToggleProps) {

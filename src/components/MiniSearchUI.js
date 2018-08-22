@@ -3,22 +3,19 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import NavbarSearch from '../components/NavbarSearch';
-import SearchResults from '../components/SearchResults';
-import Scrollable from '../components/Scrollable';
-import SearchResultsCount from '../components/SearchResultsCount';
+import NavbarSearch from './NavbarSearch';
+import SearchResults from './SearchResults';
+import Scrollable from './Scrollable';
+import SearchResultsCount from './SearchResultsCount';
 import ObjectUtils from '../util/ObjectUtils';
+import Searcher from './Searcher';
 
 type MiniSearchUIProps = {
   /**
    * A scale (1.0 = 100%) to use when rendering the search results part of
    * the MiniSearchUI. Optional—defaults to 100%.
    */
-  scale: number;
-};
-
-type MiniSearchUIDefaultProps = {
-  scale: number;
+  scale?: number;
 };
 
 /**
@@ -27,13 +24,13 @@ type MiniSearchUIDefaultProps = {
  * showing the resulting documents. It must be nested inside a Searcher component and will use that parent
  * Searcher to manage its state.
  */
-export default class MiniSearchUI extends React.Component<MiniSearchUIDefaultProps, MiniSearchUIProps, void> {
+export default class MiniSearchUI extends React.Component<MiniSearchUIProps, void> {
   static defaultProps = {
     scale: 1.0,
   };
 
   static contextTypes = {
-    searcher: PropTypes.any,
+    searcher: PropTypes.instanceOf(Searcher),
   };
 
   static displayName = 'MiniSearchUI';
@@ -55,6 +52,8 @@ export default class MiniSearchUI extends React.Component<MiniSearchUIDefaultPro
   }
 
   render() {
+    const scale = this.props.scale ? this.props.scale : 1.0;
+
     return (
       <div style={{ minHeight: '50vh' }}>
         <NavbarSearch
@@ -79,7 +78,7 @@ export default class MiniSearchUI extends React.Component<MiniSearchUIDefaultPro
             format="simple"
             entityFields={ObjectUtils.toMap([])}
             style={{
-              transform: `scale(${this.props.scale}, ${this.props.scale})`,
+              transform: `scale(${scale}, ${scale})`,
             }}
           />
         </Scrollable>

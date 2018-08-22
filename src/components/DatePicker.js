@@ -6,14 +6,14 @@ type DatePickerProps = {
    * The starting point to show when the picker is first
    * opened. Optional.
    */
-  startingDate: Date | null,
+  startingDate?: Date,
   /**
    * The ending point to show when the picker is first
    * opened. Optional. (Only applies if range is set.)
    */
-  endingDate: Date | null,
+  endingDate?: Date,
   /** If set, then choose a date range instead of a single date. */
-  range: boolean,
+  range?: boolean,
   /**
    * Callback that will be called with the starting (and ending,
    * if specifying a range) date and which has no return value.
@@ -21,20 +21,14 @@ type DatePickerProps = {
   updateDate: (start: Date, end: Date) => void,
 };
 
-type DatePickerDefaultProps = {
-  startingDate: Date | null,
-  endingDate: Date | null,
-  range: boolean,
-};
-
 /**
  * Component to let the user choose either a single
  * date or a starting/ending range.
  */
-export default class DatePicker extends React.Component<DatePickerDefaultProps, DatePickerProps, void> {
-  static defaultProps: DatePickerDefaultProps = {
-    startingDate: null,
-    endingDate: null,
+export default class DatePicker extends React.Component<DatePickerProps, void> {
+  static defaultProps = {
+    startingDate: undefined,
+    endingDate: undefined,
     range: false,
   };
 

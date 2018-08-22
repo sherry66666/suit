@@ -2,17 +2,11 @@ import React from 'react';
 
 type SentimentBarProps = {
   /** The amount of positive sentiment for this document/object. Defaults to 0. */
-  posCount: number,
+  posCount?: number,
   /** The amount of negative sentiment for this document/object. Defaults to 0. */
-  negCount: number,
-  /** A callback used if the user clicks the positive or negative link. */
-  onClick: (clickedPositive: boolean) => void;
-};
-
-type SentimentBarDefaultProps = {
-  posCount: number,
-  negCount: number,
-  onClick: (clickedPositive: boolean) => void;
+  negCount?: number,
+  /** An optional callback used if the user clicks the positive or negative link. */
+  onClick?: (clickedPositive: boolean) => void;
 };
 
 /**
@@ -21,7 +15,7 @@ type SentimentBarDefaultProps = {
  * for entirely negative sentiment, all green for entirely positive sentiment, or
  * and empty bar if there is no sentiment information to display.
  */
-export default class SentimentBar extends React.Component<SentimentBarDefaultProps, SentimentBarProps, void> {
+export default class SentimentBar extends React.Component<SentimentBarProps, void> {
   static defaultProps = {
     posCount: 0,
     negCount: 0,
@@ -37,16 +31,16 @@ export default class SentimentBar extends React.Component<SentimentBarDefaultPro
     let showNeg = true;
     let showNeither = false;
 
-    const clickPositive = (event: Event & { target: HTMLElement }) => {
+    const clickPositive = (event: SyntheticEvent<HTMLElement>) => {
       this.props.onClick(true);
-      event.target.blur();
-      event.target.parentElement.blur();
+      event.currentTarget.blur();
+      event.currentTarget.parentElement.blur();
     };
 
-    const clickNegative = (event: Event & { target: HTMLElement }) => {
+    const clickNegative = (event: SyntheticEvent<HTMLElement>) => {
       this.props.onClick(false);
-      event.target.blur();
-      event.target.parentElement.blur();
+      event.currentTarget.blur();
+      event.currentTarget.parentElement.blur();
     };
 
     if (this.posCount === 0 && this.negCount === 0) {
@@ -92,6 +86,9 @@ export default class SentimentBar extends React.Component<SentimentBarDefaultPro
       />
     ) : '';
 
+    const posCount = this.props.posCount ? this.props.posCount : 0;
+    const negCount = this.props.negCount ? this.props.negCount : 0;
+
     return (
       <div className="attivio-sentiment-chart">
         <a
@@ -102,7 +99,9 @@ export default class SentimentBar extends React.Component<SentimentBarDefaultPro
         >
           Positive
           <span className="attivio-sentiment-chart-count">
-            ({this.props.posCount})
+            {'('}
+            {posCount}
+            {')'}
           </span>
         </a>
         <a
@@ -113,7 +112,9 @@ export default class SentimentBar extends React.Component<SentimentBarDefaultPro
         >
           Negative
           <span className="attivio-sentiment-chart-count">
-            ({this.props.negCount})
+            {'('}
+            {negCount}
+            {')'}
           </span>
         </a>
         <div className="attivio-sentiment-chart-bar">

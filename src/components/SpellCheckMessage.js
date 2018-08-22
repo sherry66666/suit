@@ -6,6 +6,7 @@ import { withRouter } from 'react-router-dom';
 import QueryString from 'query-string';
 
 import Card from './Card';
+import Searcher from './Searcher';
 
 type SpellCheckMessageProps = {
   location: PropTypes.object.isRequired;
@@ -15,9 +16,9 @@ type SpellCheckMessageProps = {
 /**
  * A suggested alternate query if one is available.
  */
-class SpellCheckMessage extends React.Component<void, SpellCheckMessageProps, void> {
+class SpellCheckMessage extends React.Component<SpellCheckMessageProps, void> {
   static contextTypes = {
-    searcher: PropTypes.any,
+    searcher: PropTypes.instanceOf(Searcher),
   };
 
   static displayName = 'SpellCheckMessage';
@@ -73,8 +74,12 @@ class SpellCheckMessage extends React.Component<void, SpellCheckMessageProps, vo
   render() {
     return this.getLink() && (
       <Card borderless style={{ paddingLeft: '20%', fontSize: '2rem' }}>
-        Your search returned no results. <br />
-        Did you mean: {this.getLink()}?
+        Your search returned no results.
+        <br />
+        Did you mean:
+        {' '}
+        {this.getLink()}
+        ?
       </Card>
     );
   }

@@ -9,34 +9,35 @@ import MenuItem from 'react-bootstrap/lib/MenuItem';
 
 import Configurable from './Configurable';
 import AutoCompleteInput from './AutoCompleteInput';
+import Searcher from './Searcher';
 
 declare var webkitSpeechRecognition: any; // Prevent complaints about this not existing
 
 type SearchBarProps = {
   history: PropTypes.object.isRequired;
   /** If set, this will be styled to live inside a Masthead component. */
-  inMasthead: boolean;
+  inMasthead?: boolean;
   /**
    * The placeholder text to display when the input field is empty and Simple
    * Query Language is selected. Defaults to “Search…”
    */
-  placeholder: string;
+  placeholder?: string;
   /**
    * The placeholder text to display when the input field is empty and Advanced
    * Query Language is selected. Defaults to “Enter an advanced query…”
    */
-  placeholderAdvanced: string;
+  placeholderAdvanced?: string;
   /**
    * Whether to show a toggle for simple/advanced language in the search bar.
    * Defaults to true.
    */
-  allowLanguageSelect: boolean;
+  allowLanguageSelect?: boolean;
   /**
    * If set, the microphone button is displayed in the search field and the
    * user can use speech recognition to input the query terms. This functionality
    * is only available if the user’s browser is Chrome.
    */
-  allowVoice: boolean;
+  allowVoice?: boolean;
   /**
    * If set, the search bar’s input field will use autocomplete via this URI.
    * Otherwise, if the configuration is available, the autoCompleteUri in the
@@ -44,28 +45,16 @@ type SearchBarProps = {
    * Otherwise, the search bar will not autocomplete.
    * Note that this is relative to the baseUri field in the configuration.
    */
-  autoCompleteUri: string;
+  autoCompleteUri?: string;
   /**
    * Optional. The location of the node through which to interact with Attivio.
    * Defaults to the value in the configuration.
    */
-  baseUri: string;
+  baseUri?: string;
   /** The label to show on the search button. Defaults to "Go". */
-  buttonLabel: string;
+  buttonLabel?: string;
   /** If set, this is the route to navigate to upon executing a search. By default, no navigation will occur when searching. */
-  route: string | null;
-};
-
-type SearchBarDefaultProps = {
-  inMasthead: boolean;
-  placeholder: string;
-  placeholderAdvanced: string;
-  allowLanguageSelect: boolean;
-  allowVoice: boolean;
-  buttonLabel: string;
-  autoCompleteUri: string | null;
-  route: string | null;
-  baseUri: string;
+  route?: string;
 };
 
 type SearchBarState = {
@@ -77,21 +66,21 @@ type SearchBarState = {
  * Component to include in the Masthead for entering the query
  * to use when searching. Must be inside a Searcher component.
  */
-class SearchBar extends React.Component<SearchBarDefaultProps, SearchBarProps, SearchBarState> {
-  static defaultProps: SearchBarDefaultProps = {
+class SearchBar extends React.Component<SearchBarProps, SearchBarState> {
+  static defaultProps = {
     inMasthead: false,
     placeholder: 'Search\u2026',
     placeholderAdvanced: 'Enter an advanced query\u2026',
     buttonLabel: 'Go',
     allowLanguageSelect: true,
     allowVoice: false,
-    autoCompleteUri: null,
-    route: null,
+    autoCompleteUri: undefined,
+    route: undefined,
     baseUri: '',
   };
 
   static contextTypes = {
-    searcher: PropTypes.any,
+    searcher: PropTypes.instanceOf(Searcher),
   };
 
   static displayName = 'SearchBar';
@@ -223,12 +212,10 @@ class SearchBar extends React.Component<SearchBarDefaultProps, SearchBarProps, S
     }
   }
 
-  doKeyPress(e: Event) {
+  doKeyPress(e: SyntheticKeyboardEvent<HTMLInputElement>) {
     // If the user presses enter, do the search
-    if (e.target instanceof HTMLInputElement) {
-      if (e.keyCode === 13) {
-        this.doSearch();
-      }
+    if (e.keyCode === 13) {
+      this.doSearch();
     }
   }
 
@@ -328,25 +315,24 @@ class SearchBar extends React.Component<SearchBarDefaultProps, SearchBarProps, S
     }
 
     const suggestionList = this.getSuggestionList();
-    const inputComponent = this.props.autoCompleteUri ?
-      (
-        <AutoCompleteInput
-          uri={`${this.props.baseUri}${this.props.autoCompleteUri}`}
-          updateValue={this.updateQuery}
-          placeholder={placeholder || ''}
-          value={query}
-          className={inputClass}
-        />
-      ) : (
-        <input
-          type="search"
-          className={inputClass}
-          placeholder={placeholder}
-          onChange={this.queryChanged}
-          onKeyDown={this.doKeyPress}
-          value={query}
-        />
-      );
+    const inputComponent = this.props.autoCompleteUri ? (
+      <AutoCompleteInput
+        uri={`${this.props.baseUri ? this.props.baseUri : ''}${this.props.autoCompleteUri}`}
+        updateValue={this.updateQuery}
+        placeholder={placeholder || ''}
+        value={query}
+        className={inputClass}
+      />
+    ) : (
+      <input
+        type="search"
+        className={inputClass}
+        placeholder={placeholder}
+        onChange={this.queryChanged}
+        onKeyDown={this.doKeyPress}
+        value={query}
+      />
+    );
 
     return (
       <div className={containerClass}>

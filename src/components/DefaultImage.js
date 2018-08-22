@@ -8,14 +8,11 @@ type DefaultImageProps = {
    */
   src: string;
   /**
-   * The address of a default image to display if there's an issue displaying the prefered image address. Optional.
+   * The address of a default image to display if there's an issue displaying
+   * the preferred image address. Optional.
    */
-  defaultSrc: string | null;
+  defaultSrc?: string;
 };
-
-type DefaultImageDefaultProps = {
-  defaultSrc: string | null;
-}
 
 type DefaultImageState = {
   src: string | null;
@@ -26,9 +23,9 @@ type DefaultImageState = {
  * If neither provided source is successfully displayed, then display nothing.
  * You can pass in any props that work for a standard <img> tag and they'll be added to the inserted image.
  */
-export default class DefaultImage extends React.Component<DefaultImageDefaultProps, DefaultImageProps, DefaultImageState> {
+export default class DefaultImage extends React.Component<DefaultImageProps, DefaultImageState> {
   static defaultProps = {
-    defaultSrc: null,
+    defaultSrc: undefined,
   }
 
   constructor(props: DefaultImageProps) {
@@ -43,7 +40,8 @@ export default class DefaultImage extends React.Component<DefaultImageDefaultPro
 
   onError() {
     let src = null;
-    if (this.state.src !== this.props.defaultSrc) {
+    if (this.props.defaultSrc && this.state.src !== this.props.defaultSrc) {
+      // If the defaultSrc prop is set and we're not already using it, try it.
       src = this.props.defaultSrc;
     }
     this.setState({
@@ -53,8 +51,12 @@ export default class DefaultImage extends React.Component<DefaultImageDefaultPro
 
   render() {
     const src = this.state.src;
+
+    const otherProps = Object.assign({}, this.props);
+    delete otherProps.defaultSrc;
+    delete otherProps.src;
     if (src !== null) {
-      return <img src={this.state.src} onError={this.onError} {...this.props} />; // eslint-disable-line jsx-a11y/alt-text
+      return <img src={this.state.src} onError={this.onError} {...otherProps} />; // eslint-disable-line jsx-a11y/alt-text
     }
     return null;
   }

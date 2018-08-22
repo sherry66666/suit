@@ -7,8 +7,8 @@ import FetchUtils from './FetchUtils';
 export default class AuthUtils {
   static USER_KEY = 'suit-user';
   static TIMEOUT = 30 * 60 * 1000;
-  static users;
-  static config;
+  static users: any;
+  static config: any;
 
   /**
    * Called by the application to pass in configuration to the
@@ -45,7 +45,7 @@ export default class AuthUtils {
         // And then call the callback
         callback();
       }).catch(() => {
-       // Always do the callback even if we got an error fetching
+        // Always do the callback even if we got an error fetching
         callback();
       });
     } else if (AuthUtils.config.ALL.authType === 'NONE') {
@@ -102,7 +102,8 @@ export default class AuthUtils {
       const remainder = compTo.substring(4);
       const obfuscatedComp = AuthUtils.obfuscate(comp);
       return obfuscatedComp === remainder;
-    } else if (compTo.startsWith('MD5:')) {
+    }
+    if (compTo.startsWith('MD5:')) {
       const remainder = compTo.substring(4);
       const md5Comp = md5(comp).toString();
       return md5Comp === remainder;
@@ -246,7 +247,8 @@ export default class AuthUtils {
         null,
         fetchResponseCallback,
         'GET',
-        'Got an error retrieving the current user\u2019s details.');
+        'Got an error retrieving the current user\u2019s details.',
+      );
     } else {
       // If we're doing our own authentication, and nobody is logged in, pass null to the callback
       callback(null);

@@ -1,16 +1,16 @@
 // @flow
-import React, { Children } from 'react';
+import * as React from 'react';
 
 type NavbarProps = {
   /**
    * Any children can live inside the Navbar but those components whose
    * names start with "Navbar" are designed explicitly to be there.
    */
-  children: Children;
+  children: React.Node;
 };
 
 /** A navigation bar that's under the main Masthead. */
-export default class Navbar extends React.Component<void, NavbarProps, void> {
+export default class Navbar extends React.Component<NavbarProps, void> {
   static displayName = 'Navbar';
 
   render() {

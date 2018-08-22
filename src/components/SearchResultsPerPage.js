@@ -3,15 +3,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import Menu, { MenuItemDef } from './Menu';
+import Searcher from './Searcher';
 
 type SearchResultsPerPageProps = {
   /** The options to show. Defaults to 10, 25, 50, and 100. */
-  options: Array<number>;
-};
-
-type SearchResultsPerPageDefaultProps = {
-  /** The options to show. Defaults to 10, 25, 50, and 100. */
-  options: Array<number>;
+  options?: Array<number>;
 };
 
 /**
@@ -19,13 +15,13 @@ type SearchResultsPerPageDefaultProps = {
  * on each page. It works with the parent Searcher component to
  * update its property and to show the current value.
  */
-export default class SearchResultsPerPage extends React.Component<SearchResultsPerPageDefaultProps, SearchResultsPerPageProps, void> { // eslint-disable-line max-len
+export default class SearchResultsPerPage extends React.Component<SearchResultsPerPageProps, void> { // eslint-disable-line max-len
   static defaultProps = {
     options: [10, 25, 50, 100],
   };
 
   static contextTypes = {
-    searcher: PropTypes.any,
+    searcher: PropTypes.instanceOf(Searcher),
   };
 
   static displayName = 'SearchResultsPerPage';
@@ -50,10 +46,10 @@ export default class SearchResultsPerPage extends React.Component<SearchResultsP
       value = searcher.state.resultsPerPage;
     }
 
-    const items = this.props.options.map((count) => {
+    const items = this.props.options ? this.props.options.map((count) => {
       const stringCount = count.toString();
       return new MenuItemDef(stringCount, stringCount);
-    });
+    }) : [];
 
     return (
       <Menu
