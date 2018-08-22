@@ -2,6 +2,8 @@
 
 import React from 'react';
 
+import ClickableDiv from './ClickableDiv';
+
 type CardPickerCardProps = {
   /**
    * The label to show in the card.
@@ -42,12 +44,7 @@ export default class CardPickerCard extends React.Component<CardPickerCardProps,
     if (!this.props.selected) {
       this.props.onClick();
     }
-    if (this.card) {
-      this.card.blur();
-    }
   }
-
-  card: HTMLDivElement | null;
 
   render() {
     const colCount = this.props.columns ? this.props.columns : 3; // Make flow happy
@@ -84,14 +81,9 @@ export default class CardPickerCard extends React.Component<CardPickerCardProps,
     );
 
     return (
-      <div
-        style={style}
+      <ClickableDiv
         onClick={this.onClick}
-        role="button"
-        tabIndex={0}
-        ref={(c) => {
-          this.card = c;
-        }}
+        style={style}
       >
         <div
           style={{
@@ -119,7 +111,7 @@ export default class CardPickerCard extends React.Component<CardPickerCardProps,
         >
           {this.props.label}
         </div>
-      </div>
+      </ClickableDiv>
     );
   }
 }

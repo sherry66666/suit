@@ -2,6 +2,8 @@
 
 import React from 'react';
 
+import ClickableDiv from './ClickableDiv';
+
 type ToggleSwitchProps = {
   /** Whether the switch is in the “on” position. */
   on: boolean;
@@ -27,9 +29,6 @@ export default class ToggleSwitch extends React.Component<ToggleSwitchProps, voi
 
   static displayName = 'ToggleSwitch';
 
-  onButton: ?HTMLDivElement;
-  offButton: ?HTMLDivElement;
-
   render() {
     const disabledClass = this.props.disabled ? 'disabled' : '';
     const containerClass = `toggle-switch-container ${disabledClass}`;
@@ -39,44 +38,28 @@ export default class ToggleSwitch extends React.Component<ToggleSwitchProps, voi
     if (!this.props.disabled) {
       return (
         <div className={containerClass}>
-          <div
+          <ClickableDiv
             className={offClass}
             onClick={() => {
               if (this.props.on && !this.props.disabled) {
                 // On now, turn it off
                 this.props.onChange(false);
               }
-              if (this.offButton) {
-                this.offButton.blur();
-              }
-            }}
-            role="button"
-            tabIndex={0}
-            ref={(c) => {
-              this.offButton = c;
             }}
           >
             {this.props.offLabel}
-          </div>
-          <div
+          </ClickableDiv>
+          <ClickableDiv
             className={onClass}
             onClick={() => {
               if (!this.props.on && !this.props.disabled) {
                 // Off now, turn it on
                 this.props.onChange(true);
               }
-              if (this.onButton) {
-                this.onButton.blur();
-              }
-            }}
-            role="button"
-            tabIndex={0}
-            ref={(c) => {
-              this.onButton = c;
             }}
           >
             {this.props.onLabel}
-          </div>
+          </ClickableDiv>
         </div>
       );
     }
