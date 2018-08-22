@@ -45,8 +45,11 @@ export default class CollapsiblePanel extends React.Component<CollapsiblePanelPr
   link: ?HTMLAnchorElement;
 
   toggleState() {
-    const open = !this.state.open;
-    this.setState({ open });
+    this.setState((originalState: CollapsiblePanelState) => {
+      return {
+        open: !originalState.open,
+      };
+    });
     if (this.link) {
       this.link.blur();
     }

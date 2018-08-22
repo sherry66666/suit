@@ -45,14 +45,16 @@ class Doc360Breadcrumbs extends React.Component<Doc360BreadcrumbsProps, Doc360Br
     // we are going back, so we don't want this location added to the history
     if (!this.state.back) {
       if (nextProps.location.key !== this.props.location.key) {
-        const history = this.state.history.slice();
-        history.push(new HistoryEntry(this.findCurrentDocName(), this.props.location));
-        this.setState({
-          history,
+        this.setState((oldState: Doc360BreadcrumbsState) => {
+          const history = oldState.history.slice();
+          history.push(new HistoryEntry(this.findCurrentDocName(), this.props.location));
+          return {
+            history,
+          };
         });
       }
     } else {
-      this.setState({ back: false });
+      this.setState();
     }
   }
 

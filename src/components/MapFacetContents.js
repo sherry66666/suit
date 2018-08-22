@@ -111,25 +111,29 @@ class MapFacetContents extends React.Component<MapFacetContentsProps, MapFacetCo
   }
 
   create(e: any) {
-    const geoFilters = this.state.geoFilters.slice();
-    let updating = this.state.updating;
-    updating = MapFacetContents.getFilter(e);
-    geoFilters.push(updating);
-    this.setState({
-      geoFilters,
-      updating,
+    this.setState((newState: MapFacetContentsState) => {
+      const geoFilters = newState.geoFilters.slice();
+      let updating = newState.updating;
+      updating = MapFacetContents.getFilter(e);
+      geoFilters.push(updating);
+      return {
+        geoFilters,
+        updating,
+      };
     });
   }
 
   delete(e: any) {
-    const geoFilters = this.state.geoFilters.slice();
-    const index = geoFilters.indexOf(MapFacetContents.getFilter(e));
-    if (index !== -1) {
-      geoFilters.splice(index, 1);
-    }
-    this.setState({
-      geoFilters,
-      updating: '',
+    this.setState((newState: MapFacetContentsState) => {
+      const geoFilters = newState.geoFilters.slice();
+      const index = geoFilters.indexOf(MapFacetContents.getFilter(e));
+      if (index !== -1) {
+        geoFilters.splice(index, 1);
+      }
+      return {
+        geoFilters,
+        updating: '',
+      };
     });
   }
 
@@ -144,16 +148,18 @@ class MapFacetContents extends React.Component<MapFacetContentsProps, MapFacetCo
   }
 
   update(e: any) {
-    const geoFilters = this.state.geoFilters.slice();
-    let updating = this.state.updating;
-    updating = MapFacetContents.getFilter(e);
-    const index = geoFilters.indexOf(this.state.updating);
-    if (index !== -1) {
-      geoFilters.splice(index, 1, updating);
-    }
-    this.setState({
-      geoFilters,
-      updating,
+    this.setState((newState: MapFacetContentsState) => {
+      const geoFilters = newState.geoFilters.slice();
+      let updating = newState.updating;
+      updating = MapFacetContents.getFilter(e);
+      const index = geoFilters.indexOf(this.state.updating);
+      if (index !== -1) {
+        geoFilters.splice(index, 1, updating);
+      }
+      return {
+        geoFilters,
+        updating,
+      };
     });
   }
 
@@ -170,7 +176,9 @@ class MapFacetContents extends React.Component<MapFacetContentsProps, MapFacetCo
   }
 
   handleNewData(buckets: Array<SearchFacetBucket>) {
-    this.setState(MapFacetContents.calcState(buckets, this.state.zoom, this.state.geoFilters, this.state.updating));
+    this.setState((newState: MapFacetContentsState) => {
+      return MapFacetContents.calcState(buckets, newState.zoom, newState.geoFilters, newState.updating);
+    });
   }
 
   viewportChange(viewport: any) {

@@ -47,7 +47,10 @@ export default class Configuration extends React.Component<ConfigurationProps, a
    * @param {*} callback a callback to run after the values have been set
    */
   set(prefix: string, newConfigItems: any, callback?: () => void) {
-    this.setState(Object.assign({}, this.state[prefix || 'ALL'], newConfigItems), callback);
+    this.setState((originalState: any) => {
+      const newState = Object.assign({}, originalState[prefix || 'ALL'], newConfigItems);
+      return newState;
+    }, callback);
   }
 
   /**

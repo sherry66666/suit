@@ -4,6 +4,8 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import { withRouter } from 'react-router-dom';
 
+import ClickableDiv from './ClickableDiv';
+
 type BigButtonProps = {
   location: PropTypes.object.isRequired;
   history: PropTypes.object.isRequired;
@@ -72,18 +74,13 @@ class BigButton extends React.Component<BigButtonProps, void> {
       className = `${className} btn-${this.props.bsStyle}`;
     }
     return (
-      <div
+      <ClickableDiv
         onClick={this.doClick}
         className={className}
         style={this.props.style}
-        role="button"
-        tabIndex="0"
-        ref={(c) => {
-          this.button = c;
-        }}
       >
         {this.props.children}
-      </div>
+      </ClickableDiv>
     );
   }
 }

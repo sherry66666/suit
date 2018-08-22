@@ -228,18 +228,20 @@ export default class DummySearcher extends React.Component<DummySearcherProps, D
    */
   updateSort(newSort: string) {
     if (newSort !== this.state.sort) {
-      let sort = this.state.sort;
-      if (sort && sort.length > 0) {
-        sort[0] = newSort;
-      } else {
-        sort = [newSort];
-      }
-      this.setState({
-        haveSearched: false,
-        response: undefined,
-        error: undefined,
-        resultsOffset: 0,
-        sort,
+      this.setState((oldState: DummySearcherState) => {
+        let sort = oldState.sort;
+        if (sort && sort.length > 0) {
+          sort[0] = newSort;
+        } else {
+          sort = [newSort];
+        }
+        return {
+          haveSearched: false,
+          response: undefined,
+          error: undefined,
+          resultsOffset: 0,
+          sort,
+        };
       });
     }
   }
@@ -255,14 +257,16 @@ export default class DummySearcher extends React.Component<DummySearcherProps, D
    * Add multiple query filters (in AQL) to the query request.
    */
   addGeoFilters(filters: Array<string>) {
-    let geoFilters = this.state.geoFilters.slice();
-    geoFilters = geoFilters.concat(filters);
-    this.setState({
-      haveSearched: false,
-      response: undefined,
-      error: undefined,
-      resultsOffset: 0,
-      geoFilters,
+    this.setState((oldState: DummySearcherState) => {
+      let geoFilters = oldState.geoFilters.slice();
+      geoFilters = geoFilters.concat(filters);
+      return {
+        haveSearched: false,
+        response: undefined,
+        error: undefined,
+        resultsOffset: 0,
+        geoFilters,
+      };
     });
   }
 
@@ -270,17 +274,19 @@ export default class DummySearcher extends React.Component<DummySearcherProps, D
    * Remove a query filter by name (in AQL) from the query request.
    */
   removeGeoFilter(filter: string) {
-    const geoFilters = this.state.geoFilters.slice();
-    const index = geoFilters.indexOf(filter);
-    if (index !== -1) {
-      geoFilters.splice(index, 1);
-    }
-    this.setState({
-      haveSearched: false,
-      response: undefined,
-      error: undefined,
-      resultsOffset: 0,
-      geoFilters,
+    this.setState((oldState: DummySearcherState) => {
+      const geoFilters = oldState.geoFilters.slice();
+      const index = geoFilters.indexOf(filter);
+      if (index !== -1) {
+        geoFilters.splice(index, 1);
+      }
+      return {
+        haveSearched: false,
+        response: undefined,
+        error: undefined,
+        resultsOffset: 0,
+        geoFilters,
+      };
     });
   }
 

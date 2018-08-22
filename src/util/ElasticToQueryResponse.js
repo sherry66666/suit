@@ -22,10 +22,10 @@ export default class ElasticToQueryResponse {
     }
 
     if (json.hits.hits.length > 0) {
-      result.documents = ElasticToQueryResponse.getElasticDocuments(json.hits.hits, customOptions);
+      result.documents = ElasticToQueryResponse.convertElasticDocuments(json.hits.hits, customOptions);
     }
     if (json.aggregations || Object.keys(json.aggregations).length > 0) {
-      result.facets = ElasticToQueryResponse.getElasticFacets(json.aggregations, customOptions);
+      result.facets = ElasticToQueryResponse.convertElasticFacets(json.aggregations, customOptions);
     }
 
     return result;
@@ -38,7 +38,7 @@ export default class ElasticToQueryResponse {
     return Array.isArray(v) ? v : [v];
   }
 
-  static getElasticDocuments(documents: any, customOptions: any) {
+  static convertElasticDocuments(documents: any, customOptions: any) {
     return documents.map((doc) => {
       const mapp = customOptions.mappings;
       const fields = {};
@@ -56,20 +56,35 @@ export default class ElasticToQueryResponse {
     });
   }
 
-  static getElasticFacets(facets: any, customOptions: any) {
-    return Object.keys(facets).map((field) => {
+  static convertElasticFacets(facets: any, customOptions: any): Array<SearchFacet> {
+    // Copy the facets
+    const countlessFacets = Object.assign({}, facets);
+    // If there is a count, delete it
+    if (countlessFacets.count) {
+      delete countlessFacets.count;
+    }
+
+    // Get the keys in the facets, each of which is a facet name
+    const facetNames = Object.keys(countlessFacets);
+
+    const attivioFacets = facetNames.map((facetName: string) => {
+      // Get the facet configuration information based on its name
       const facetConfig = customOptions.facets.find((f) => {
-        return f.field === field;
+        return f.field === facetName;
       }) || {};
 
-      return SearchFacet.fromJson({
+      const jsonModel = {
         name: facetConfig.field,
         field: facetConfig.field,
         label: facetConfig.displayName,
-        buckets: facets[field].buckets.map((b) => {
+        buckets: facets[facetName].buckets.map((b) => {
           return ({ value: b.key, count: b.doc_count, filter: `${facetConfig.field}:'${b.key}'` });
         }),
-      });
+      };
+
+      return SearchFacet.fromJson(jsonModel);
     });
+
+    return attivioFacets;
   }
 }

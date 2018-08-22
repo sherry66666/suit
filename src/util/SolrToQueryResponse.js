@@ -11,9 +11,9 @@ import SearchFacet from '../api/SearchFacet';
  */
 export default class SolrToQueryResponse {
   /**
-   * Do the convertsion.
+   * Do the conversion.
    *
-   * @param json          the JSON returned from the call
+   * @param json          the JSON returned from the call to Solr
    * @param customOptions the custom options defined in the configuration
    */
   static convert(json: any, customOptions: any): QueryResponse {
@@ -27,10 +27,10 @@ export default class SolrToQueryResponse {
       result.totalHits = json.response.numFound;
     }
     if (json.response.docs.length > 0) {
-      result.documents = SolrToQueryResponse.getSolrDocuments(json.response.docs, customOptions);
+      result.documents = SolrToQueryResponse.convertSolrDocuments(json.response.docs, customOptions);
     }
     if (json.facets) {
-      result.facets = SolrToQueryResponse.getSolrFacets(json.facets, customOptions);
+      result.facets = SolrToQueryResponse.convertSolrFacets(json.facets, customOptions);
     }
 
     return result;
@@ -43,7 +43,7 @@ export default class SolrToQueryResponse {
     return Array.isArray(v) ? v : [v];
   }
 
-  static getSolrDocuments(documents: any, customOptions: any) {
+  static convertSolrDocuments(documents: any, customOptions: any): Array<SearchDocument> {
     return documents.map((doc) => {
       const mapp = customOptions.mappings;
       const fields = {};
@@ -66,28 +66,39 @@ export default class SolrToQueryResponse {
     });
   }
 
-  static getSolrFacets(facets: any, customOptions: any) {
+  static convertSolrFacets(facets: any, customOptions: any): Array<SearchFacet> {
+    // Copy the facets
     const countlessFacets = Object.assign({}, facets);
+    // If there is a count, delete it
     if (countlessFacets.count) {
       delete countlessFacets.count;
     }
 
-    return Object.keys(countlessFacets).map((field) => {
+    // Get the keys in the facets, each of which is a facet name
+    const facetNames = Object.keys(countlessFacets);
+
+    const attivioFacets = facetNames.map((facetName: string) => {
+      // Get the facet configuration information based on its name
       const facetConfig = customOptions.facets.find((f) => {
-        return f.field === field;
+        return f.field === facetName;
       }) || {};
-      return SearchFacet.fromJson({
-        name: facetConfig.field || field,
-        field: facetConfig.field || field,
-        label: facetConfig.displayName || field,
-        buckets: facets[field].buckets.map((b) => {
+
+      const jsonModel = {
+        name: facetConfig.field || facetName,
+        field: facetConfig.field || facetName,
+        label: facetConfig.displayName || facetName,
+        buckets: facets[facetName].buckets.map((b) => {
           return ({
             value: b.val,
             count: b.count,
             filter: `${facetConfig.field}:'${b.val}'`,
           });
         }),
-      });
+      };
+
+      return SearchFacet.fromJson(jsonModel);
     });
+
+    return attivioFacets;
   }
 }

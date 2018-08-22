@@ -48,8 +48,10 @@ export default class MoreList extends React.Component<MoreListProps, MoreListSta
   toggleButton: ?HTMLAnchorElement;
 
   toggleAllVisible() {
-    this.setState({
-      allVisible: !this.state.allVisible,
+    this.setState((oldState: MoreListState) => {
+      return {
+        allVisible: !oldState.allVisible,
+      };
     });
     if (this.toggleButton) {
       this.toggleButton.blur();

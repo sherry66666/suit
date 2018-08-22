@@ -79,9 +79,9 @@ class Breadcrumbs extends React.Component<BreadcrumbsProps, void> {
           );
         }
         // Simple breadcrumbs without links
+        const key = `${crumb.label}-${index}`;
         return (
-          <li key={`${crumb.label}-${index}`}> { // eslint-disable-line react/no-array-index-key
-          }
+          <li key={key}>
             {label}
             <span className="attivio-icon-arrow-right" />
           </li>

@@ -157,19 +157,23 @@ export default class AutoCompleteInput extends React.Component<AutoCompleteInput
       });
     } else if (event.keyCode === 40 && this.state.cursor < suggestions.length - 1) {
       // This condition is satisfied when a user presses the down arrow key.
-      const newCursor = this.state.cursor + 1;
-      const value = suggestions[newCursor];
-      this.setState({
-        cursor: newCursor,
-        queryValue: value,
+      this.setState((oldState: AutoCompleteInputState) => {
+        const newCursor = oldState.cursor + 1;
+        const value = suggestions[newCursor];
+        return {
+          cursor: newCursor,
+          queryValue: value,
+        };
       });
     } else if (event.keyCode === 38 && this.state.cursor > 0) {
       // This condition is satisfied when a user presses the up arrow key.
-      const newCursor = this.state.cursor - 1;
-      const value = suggestions[newCursor];
-      this.setState({
-        cursor: newCursor,
-        queryValue: value,
+      this.setState((oldState: AutoCompleteInputState) => {
+        const newCursor = oldState.cursor - 1;
+        const value = suggestions[newCursor];
+        return {
+          cursor: newCursor,
+          queryValue: value,
+        };
       });
     }
   }
